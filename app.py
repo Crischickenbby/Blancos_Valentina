@@ -130,8 +130,6 @@ def login():
             duration_ms = int(tiempo_respuesta * 1000)
             print(f" RENDIMIENTO - Login exitoso: {tiempo_respuesta:.3f} segundos {'OK' if tiempo_respuesta <= 2 else 'LENTO'}")
 
-            # 📝 LOG: Registrar login exitoso
-            log_login(user[0], email, success=True)
 
             if user_role == 3:
                 flash("¡Inicio de sesión exitoso!", "success")
@@ -144,23 +142,13 @@ def login():
             tiempo_respuesta = tiempo_fin - tiempo_inicio
             print(f" RENDIMIENTO - Login fallido: {tiempo_respuesta:.3f} segundos {'OK' if tiempo_respuesta <= 2 else 'LENTO'}")
             
-            # 📝 LOG: Registrar intento de login fallido
-            log_login(None, email, success=False)
+        
             
             flash("Correo o contraseña incorrectos.", "error")
             return redirect('/sesion')
 
     except Exception as e:
         print(f"Error al intentar iniciar sesión: {e}")
-        
-        # 📝 LOG: Registrar error en login
-        ActivityLogger.log_activity(
-            action_type='LOGIN',
-            module='AUTH',
-            description=f'Error en login: {str(e)}',
-            details={'email': email, 'error': str(e)},
-            status='ERROR'
-        )
         
         flash("Ocurrió un problema al intentar iniciar sesión.", "error")
         return redirect('/sesion')
@@ -1984,77 +1972,6 @@ def ropa():
 
 
 # =========================================FIN DE RUTAS DE PUNTO DE VENTA====================================================
-
-#===========================================RUTA PARA DOCUMENTACIÓN DE RENDIMIENTO========================================================
-
-@app.route('/rendimiento')
-def rendimiento():
-    """
-     DOCUMENTACIÓN DE RENDIMIENTO DEL SISTEMA
-    
-    Operaciones críticas que deben completarse en ≤ 2 segundos:
-    
-    ✅ Consultar inventario (almacén)
-    ✅ Registrar venta 
-    ✅ Login de usuario
-    ✅ API de productos (punto de venta)
-    ✅ Consultar apartados
-    ✅ Abrir/cerrar caja
-    
-    El sistema mide automáticamente estos tiempos y los reporta en la consola.
-    Formato: " RENDIMIENTO - [Operación]: [tiempo]s ✅/⚠️"
-    """
-    
-    rendimiento_info = {
-        "objetivo_tiempo": "≤ 2 segundos",
-        "operaciones_criticas": [
-            {
-                "operacion": "Consultar inventario",
-                "ruta": "/almacen",
-                "descripcion": "Cargar lista completa de productos y categorías"
-            },
-            {
-                "operacion": "Registrar venta",
-                "ruta": "/api/registrar_venta",
-                "descripcion": "Procesar venta completa con actualización de stock y caja"
-            },
-            {
-                "operacion": "Login usuario",
-                "ruta": "/login", 
-                "descripcion": "Autenticación y redirección según rol"
-            },
-            {
-                "operacion": "API productos",
-                "ruta": "/api/productos",
-                "descripcion": "Obtener productos disponibles para punto de venta"
-            },
-            {
-                "operacion": "Consultar apartados",
-                "ruta": "/apartado",
-                "descripcion": "Cargar lista de apartados activos"
-            },
-            {
-                "operacion": "Operaciones de caja",
-                "ruta": "/api/caja/*",
-                "descripcion": "Abrir, cerrar caja y consultar datos de corte"
-            }
-        ],
-        "como_monitorear": [
-            "Los tiempos se muestran automáticamente en la consola del servidor",
-            "Formato:  RENDIMIENTO - [Operación]: [tiempo]s ✅/⚠️",
-            "✅ = Cumple objetivo (≤ 2s)",
-            "⚠️ LENTO = Excede objetivo (> 2s)"
-        ],
-        "optimizaciones": [
-            "Consultas SQL optimizadas con índices apropiados",
-            "Conexiones de base de datos eficientes",
-            "Validación de datos antes de operaciones BD",
-            "Manejo de errores sin timeouts innecesarios"
-        ]
-    }
-    
-    return jsonify(rendimiento_info)
-
 #===========================================FIN DOCUMENTACIÓN DE RENDIMIENTO====================================================
 
 
