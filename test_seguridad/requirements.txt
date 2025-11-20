@@ -1,3 +1,0 @@
-# Dependencias para las pruebas de seguridad
-requests>=2.31.0
-colorama>=0.4.6
