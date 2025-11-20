@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='js/punto_venta.js') }}" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="../static/img/manta.ico" type="image/x-icon">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'valentina': {
+                            'purple': '#9333ea',     // Morado principal
+                            'purple-light': '#c084fc', // Morado claro
+                            'pink': '#ec4899',       // Rosa principal
+                            'pink-light': '#f9a8d4', // Rosa claro
+                            'brown': '#C2A48A',
+                            'dark': '#3C2F2F',
+                            'cream': '#F4F1EC',
+                            'mint': '#4DD0C7',
+                            'light': '#E5E0DB'
+                        }
+                    },
+                    fontFamily: {
+                        'great-vibes': ['Great Vibes', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    {% block styles %}{% endblock %}
+    <title>{% block title %}Punto De Venta{% endblock %}</title>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar fixed left-0 top-0 w-20 lg:w-64 h-screen bg-gradient-to-b from-purple-600 to-pink-600 text-white transition-all duration-300 ease-in-out flex flex-col z-40" id="sidebar">
+            <!-- Logo -->
+            <div class="p-4 border-b border-purple-500 flex flex-col items-center">
+                <div class="centrar_logo w-full flex flex-row items-center justify-between">
+                    <div class="flex flex-col">
+                        <!-- Logo grande (solo expandido) -->
+                        <div class="logo_name lg:block text-2xl font-bold flex justify-center items-center h-full" id="sidebarLogo">
+                            <i class='bx bx-heart text-pink-200 mr-2'></i>
+                            Valentina
+                        </div>
+                        <!-- Icono pequeño (solo contraído) -->
+                        <div class="logo_icon h-12 lg:hidden" id="sidebarLogoSmall">
+                            <i class='bx bx-heart text-pink-200 text-3xl'></i>
+                        </div>
+                        <span class="hidden lg:block text-xs text-purple-100 font-medium" id="sidebarSubtitle">BLANCOS Y TEXTILES</span>
+                    </div>
+                    <!--
+                        Icono de menú lateral: Este elemento representa el botón para abrir o cerrar el menú lateral en la interfaz de punto de venta.
+                        Utiliza la clase 'bx bx-menu' de Boxicons para mostrar el ícono de menú.
+                        El identificador 'btn' permite manipularlo mediante JavaScript.
+                    -->
+                    <i class='bx bx-menu text-2xl cursor-pointer' id="btn"></i>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 py-4">
+                <ul class="nav-list space-y-2 px-2">
+                    <li>
+                        <a href="{{ url_for('venta') }}" 
+                        class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                        <i class='bx bx-cart-alt text-xl min-w-[24px]'></i>
+                        <span class="links_name ml-3 hidden lg:inline">Ventas</span>
+                    </a>
+                </li>
+                <!--
+                                <li>
+                                    <a href="{{ url_for('ropa') }}" 
+                                       class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                                        <i class='bx bx-closet text-xl min-w-[24px]'></i>
+                                        <span class="links_name ml-3 hidden lg:inline">Venta de ropa</span>
+                                    </a>
+                                </li>
+                -->
+                    <li>
+                        <a href="{{ url_for('almacen') }}" 
+                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                            <i class='bx bx-package text-xl min-w-[24px]'></i>
+                            <span class="links_name ml-3 hidden lg:inline">Productos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('apartado') }}" 
+                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                            <i class='bx bx-bookmark text-xl min-w-[24px]'></i>
+                            <span class="links_name ml-3 hidden lg:inline">Apartado</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('empleado') }}" 
+                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                            <i class='bx bx-user-plus text-xl min-w-[24px]'></i>
+                            <span class="links_name ml-3 hidden lg:inline">Empleados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('devolucion') }}" 
+                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                            <i class='bx bx-undo text-xl min-w-[24px]'></i>
+                            <span class="links_name ml-3 hidden lg:inline">Devoluciones</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('corte') }}" 
+                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                            <i class='bx bx-money-withdraw text-xl min-w-[24px]'></i>
+                            <span class="links_name ml-3 hidden lg:inline">Corte de Caja</span>
+                        </a>
+                    </li>
+                   
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col ml-20 lg:ml-64 transition-all duration-300">
+            <!-- Header -->
+            
+
+            <!-- Content Area -->
+            <div class="flex-1 flex">
+                <!-- Products Area -->
+                <div class="flex-1 p-6 bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 min-h-screen">
+                    {% block content %}
+                    <div class="max-w-5xl mx-auto min-h-[calc(100vh-100px)] flex flex-col justify-center items-center">
+                        <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">
+                            Bienvenido, {{ user.name if user else 'Usuario' }} {{ user.last_name if user else '' }}
+                        </h1>
+                        <p class="text-gray-600 text-lg mb-10 text-center">Selecciona una sección para comenzar</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Card Ventas -->
+                            <a href="{{ url_for('venta') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                                    <i class="bx bx-cart-alt text-white text-4xl"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">Ventas</h2>
+                                <p class="text-gray-500 text-center">Gestiona las ventas y el carrito de compras.</p>
+                            </a>
+                            <!-- Card Productos -->
+                            <a href="{{ url_for('almacen') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                                    <i class="bx bx-package text-white text-4xl"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">Productos</h2>
+                                <p class="text-gray-500 text-center">Administra el inventario y los productos disponibles.</p>
+                            </a>
+                            <!-- Card Apartado -->
+                            <a href="{{ url_for('apartado') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                                    <i class="bx bx-bookmark text-white text-4xl"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">Apartado</h2>
+                                <p class="text-gray-500 text-center">Gestiona los apartados y pagos pendientes.</p>
+                            </a>
+                            <!-- Card Empleados -->
+                            <a href="{{ url_for('empleado') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                                    <i class="bx bx-user-plus text-white text-4xl"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">Empleados</h2>
+                                <p class="text-gray-500 text-center">Administra el personal y sus privilegios.</p>
+                            </a>
+                            <!-- Card Devoluciones -->
+                            <a href="{{ url_for('devolucion') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                                    <i class="bx bx-undo text-white text-4xl"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">Devoluciones</h2>
+                                <p class="text-gray-500 text-center">Gestiona las devoluciones y reembolsos.</p>
+                            </a>
+                            <!-- Card Corte de Caja -->
+                            <a href="{{ url_for('corte') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                                    <i class="bx bx-money-withdraw text-white text-4xl"></i>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">Corte de Caja</h2>
+                                <p class="text-gray-500 text-center">Realiza el corte y cierre de caja.</p>
+                            </a>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

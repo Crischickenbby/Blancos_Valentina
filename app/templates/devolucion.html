@@ -1,0 +1,290 @@
+{% extends 'punto_venta.html' %}
+
+{% block title %}Gestión de Devoluciones{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-6">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">
+            <i class="fas fa-undo-alt text-purple-600 mr-3"></i>
+            Gestión de Devoluciones
+        </h1>
+        <p class="text-gray-600 text-lg">Procesa devoluciones de ventas de manera eficiente</p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-2xl border-2 border-purple-200 p-8 mb-6">
+        <!-- Header de búsqueda -->
+        <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-purple-200">
+            <div class="flex items-center">
+                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-3 mr-4 shadow-lg">
+                    <i class="fas fa-search text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Buscar Venta</h2>
+                    <p class="text-sm text-gray-600">Encuentra la venta a procesar</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs de tipo de búsqueda -->
+        <div class="flex gap-3 mb-6">
+            <button id="tab-id" class="flex-1 px-6 py-4 rounded-xl font-bold transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg">
+                <i class="fas fa-hashtag mr-2"></i>
+                Por ID de Venta
+            </button>
+            <button id="tab-fecha" class="flex-1 px-6 py-4 rounded-xl font-bold transition-all duration-300 bg-white text-gray-600 border-2 border-gray-300 hover:border-purple-400 hover:shadow-md">
+                <i class="fas fa-calendar mr-2"></i>
+                Por Fecha
+            </button>
+        </div>
+
+        <!-- Campos de búsqueda -->
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
+            <div id="campo-id">
+                <label class="block text-sm font-bold text-purple-700 mb-3 uppercase tracking-wide">
+                    <i class="fas fa-hashtag mr-2"></i>
+                    Ingrese el ID de la Venta
+                </label>
+                <div class="flex gap-3">
+                    <input type="number" id="buscar-venta" placeholder="Ejemplo: 12345"
+                           class="flex-1 px-5 py-4 border-2 border-purple-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-400 transition-colors shadow-sm font-semibold text-gray-800 text-lg">
+                    <button id="btn-buscar-venta" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-10 py-4 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg">
+                        <i class="fas fa-search text-lg mr-2"></i>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+            <div id="campo-fecha" style="display: none;">
+                <label class="block text-sm font-bold text-pink-700 mb-3 uppercase tracking-wide">
+                    <i class="fas fa-calendar mr-2"></i>
+                    Seleccione la Fecha de Venta
+                </label>
+                <div class="flex gap-3">
+                    <input type="date" id="buscar-fecha"
+                           class="flex-1 px-5 py-4 border-2 border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 hover:border-pink-400 transition-colors shadow-sm font-semibold text-gray-800 text-lg">
+                    <button id="btn-buscar-fecha" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-10 py-4 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg">
+                        <i class="fas fa-search text-lg mr-2"></i>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Sale Information Section -->
+        <div id="info-venta" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 p-8 mb-6">
+            <div class="border-b-2 border-gray-200 pb-4 mb-6">
+                <h2 class="text-3xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-receipt text-purple-600 mr-3 text-2xl"></i>
+                    Información de la Venta
+                </h2>
+            </div>
+
+            <!-- Sale Details Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div class="flex items-center">
+                        <div class="bg-purple-600 rounded-full p-3 mr-4 shadow-md">
+                            <i class="fas fa-hashtag text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-purple-600 font-bold uppercase tracking-wide">ID de Venta</p>
+                            <p id="venta-id" class="text-3xl font-bold text-purple-800">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-6 border-2 border-pink-200 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div class="flex items-center">
+                        <div class="bg-pink-600 rounded-full p-3 mr-4 shadow-md">
+                            <i class="fas fa-calendar text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-pink-600 font-bold uppercase tracking-wide">Fecha de Venta</p>
+                            <p id="venta-fecha" class="text-xl font-bold text-pink-800">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl p-6 border-2 border-rose-200 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div class="flex items-center">
+                        <div class="bg-rose-600 rounded-full p-3 mr-4 shadow-md">
+                            <i class="fas fa-dollar-sign text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-rose-600 font-bold uppercase tracking-wide">Total de Venta</p>
+                            <p id="venta-total" class="text-3xl font-bold text-rose-800">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Return Message Area -->
+            <div id="mensaje-devolucion" class="mb-6"></div>
+
+            <!-- Products Table -->
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border-2 border-gray-200 shadow-md">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-2 mr-3">
+                        <i class="fas fa-box text-white"></i>
+                    </div>
+                    Productos de la Venta
+                </h3>
+                <div class="overflow-x-auto rounded-lg shadow-lg">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Producto</th>
+                                <th class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Cantidad</th>
+                                <th class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Precio</th>
+                                <th class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Devolver</th>
+                                <th class="px-6 py-4 text-center text-sm font-bold uppercase tracking-wider">Cantidad a Devolver</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos-venta" class="divide-y divide-gray-200">
+                            <!-- Productos se insertan dinámicamente aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Return Options Section -->
+            <div class="mt-8">
+                <div class="border-b-2 border-gray-200 pb-4 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-cog text-purple-600 mr-3 text-xl"></i>
+                        Opciones de Devolución
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Stock Management -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-300 shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-600 rounded-lg p-3 mr-3 shadow-md">
+                                <i class="fas fa-boxes text-white text-xl"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-purple-800">Gestión de Inventario</h4>
+                        </div>
+                        <p class="text-purple-700 mb-4 font-semibold">¿Regresar productos al inventario?</p>
+                        <select id="reintegrar-stock" class="w-full px-4 py-3.5 rounded-lg border-2 border-purple-300 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white text-gray-800 font-bold shadow-sm hover:border-purple-400 transition-colors">
+                            <option value="1">✅ Sí, agregar de nuevo al inventario</option>
+                            <option value="0">❌ No, producto defectuoso/dañado</option>
+                        </select>
+                    </div>
+
+                    <!-- Refund Method -->
+                    <div class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-6 border-2 border-pink-300 shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-pink-600 rounded-lg p-3 mr-3 shadow-md">
+                                <i class="fas fa-money-bill-wave text-white text-xl"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-pink-800">Método de Reembolso</h4>
+                        </div>
+                        <p class="text-pink-700 mb-4 font-semibold">¿Cómo se devolverá el dinero?</p>
+                        <select id="metodo-reembolso" class="w-full px-4 py-3.5 rounded-lg border-2 border-pink-300 focus:ring-2 focus:ring-pink-500 focus:outline-none bg-white text-gray-800 font-bold shadow-sm hover:border-pink-400 transition-colors">
+                            <option value="1">💵 Efectivo</option>
+                            <option value="2">🏦 Transferencia Bancaria</option>
+                            <option value="3">💳 Tarjeta de Crédito/Débito</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Observations -->
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-3 mr-3 shadow-md">
+                            <i class="fas fa-comment-alt text-white text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-800">Observaciones de la Devolución</h4>
+                    </div>
+                    <textarea id="observaciones" 
+                              class="w-full px-5 py-4 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none bg-white text-gray-800 resize-none font-medium shadow-sm hover:border-purple-400 transition-colors" 
+                              rows="5" 
+                              placeholder="Escriba detalles sobre la devolución: motivo, estado del producto, comentarios adicionales..."></textarea>
+                </div>
+
+                <!-- Confirm Button -->
+                <div class="text-center">
+                    <button id="confirmar-devolucion" 
+                            class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-5 px-12 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl border-2 border-purple-700 text-lg">
+                        <i class="fas fa-check-circle mr-3 text-2xl"></i>
+                        Confirmar Devolución
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de selección de ventas por fecha -->
+<div id="modal-seleccion-ventas" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden m-4">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt text-2xl mr-3"></i>
+                        <h2 class="text-2xl font-bold">
+                            Ventas Encontradas
+                        </h2>
+                    </div>
+                    <button id="cerrar-modal-ventas" class="text-white hover:text-gray-300 text-2xl transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-purple-100 mt-2" id="fecha-seleccionada">Selecciona la venta que deseas procesar</p>
+            </div>
+            
+            <div class="p-6 overflow-y-auto max-h-[60vh]">
+                <div id="lista-ventas-content" class="space-y-3">
+                    <!-- Las ventas se insertan dinámicamente aquí -->
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 px-6 py-4 rounded-b-2xl border-t border-gray-200">
+                <div class="flex justify-end space-x-3">
+                    <button id="cancelar-seleccion" class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors font-semibold">
+                        <i class="fas fa-times mr-2"></i>Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de detalles de devolución -->
+<div id="modal-devolucion" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" style="display: none;">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle text-2xl mr-3"></i>
+                        <h2 class="text-2xl font-bold">
+                            Detalles de la Devolución
+                        </h2>
+                    </div>
+                    <button id="cerrar-modal" class="text-white hover:text-gray-300 text-2xl transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div id="detalle-devolucion-content" class="space-y-4">
+                    <!-- Los detalles se insertan dinámicamente aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/devolucion.js') }}"></script>
+{% endblock %}

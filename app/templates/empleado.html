@@ -1,0 +1,454 @@
+{% extends 'punto_venta.html' %}
+
+{% block page_title %}Gestión de Empleados{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+    /* Estilos personalizados para los switches de Tailwind */
+    .switch-toggle {
+        opacity: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 1;
+    }
+    
+    /* Estilos para cuando el switch está activado - modal crear (morado) */
+    #addEmployeeModal .switch-toggle:checked + span {
+        background-color: #9333ea !important; /* purple-600 */
+    }
+    
+    #addEmployeeModal .switch-toggle:checked + span > span {
+        transform: translateX(20px);
+    }
+    
+    /* Estilos para cuando el switch está activado - modal editar (rosa) */
+    #editEmployeeModal .switch-toggle:checked + span {
+        background-color: #ec4899 !important; /* pink-600 */
+    }
+    
+    #editEmployeeModal .switch-toggle:checked + span > span {
+        transform: translateX(20px);
+    }
+    
+    /* Estilo del contenedor del switch */
+    label:has(.switch-toggle) {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    /* Sombra en el círculo */
+    .switch-toggle + span > span {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* Hover effect */
+    label:hover .switch-toggle + span {
+        background-color: #d1d5db;
+    }
+    
+    #addEmployeeModal label:hover .switch-toggle:checked + span {
+        background-color: #7c3aed !important;
+    }
+    
+    #editEmployeeModal label:hover .switch-toggle:checked + span {
+        background-color: #db2777 !important;
+    }
+    
+    /* Animaciones para los modales */
+    .modal-enter {
+        animation: modalEnter 0.3s ease-out;
+    }
+    
+    @keyframes modalEnter {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    /* Hover effects personalizados */
+    .employee-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    /* Gradiente animado para botones */
+    .btn-gradient {
+        background: linear-gradient(45deg, #e91e63, #38bdf8);
+        background-size: 400% 400%;
+        animation: gradientShift 3s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-6">
+    <!-- Header Section -->
+    <div class="mb-6">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">
+            <i class="fas fa-users text-purple-600 mr-3"></i>
+            Gestión de Empleados
+        </h1>
+        <p class="text-gray-600 text-lg">Administra tu equipo de trabajo</p>
+    </div>
+
+    <!-- Barra de acciones -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <button id="addEmployeeBtn" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-plus mr-2"></i>
+                Añadir Producto
+            </button>
+            
+            <div class="relative w-96">
+                <input type="text" 
+                       id="buscar-empleado" 
+                       placeholder="Buscar productos..." 
+                       class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Empleado -->
+    <div id="addEmployeeModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <!-- Header del modal -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-user-plus text-purple-600 mr-2"></i>
+                        Crear Empleado
+                    </h2>
+                    <button class="close-button text-gray-400 hover:text-gray-600 transition-colors duration-200 text-2xl">
+                        &times;
+                    </button>
+                </div>
+
+                <form id="crearEmpleadoForm" class="space-y-4">
+                    <!-- Información personal -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="nombreEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">
+                                Nombre
+                            </label>
+                            <input type="text" id="nombreEmpleado" name="nombreEmpleado" required autocomplete="off"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                        </div>
+
+                        <div>
+                            <label for="apellidosEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">
+                                Apellidos
+                            </label>
+                            <input type="text" id="apellidosEmpleado" name="apellidosEmpleado" required autocomplete="off"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="correoEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">
+                            Correo
+                        </label>
+                        <input type="email" id="correoEmpleado" name="correoEmpleado" required autocomplete="off"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                    </div>
+
+                    <div>
+                        <label for="contrasenaEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">
+                            Contraseña
+                        </label>
+                        <input type="password" id="contrasenaEmpleado" name="contrasenaEmpleado" required autocomplete="off"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                    </div>
+
+                    <!-- Privilegios -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Privilegios:
+                        </label>
+                        <div class="bg-gray-50 rounded-lg p-3 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Vender</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Vender">
+                                    <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                        <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Realizar apartado</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Realizar apartado">
+                                    <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                        <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Realizar corte de caja</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Realizar corte de caja">
+                                    <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                        <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Modificar almacén</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Modificar almacén">
+                                    <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                        <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Realizar devolución</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Realizar devolución">
+                                    <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                        <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <input type="hidden" id="privilegiosEmpleado" name="privilegiosEmpleado" required>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" class="close-button px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all duration-200 transform hover:scale-105">
+                            <i class="fas fa-save mr-2"></i>
+                            Crear Cuenta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Empleado -->
+
+    <div id="editEmployeeModal" class="fixed inset-0 bg-gray-900 bg-opacity-40 z-50 hidden items-center justify-center">
+        <div class="bg-gradient-to-br from-white via-purple-50 to-pink-50 rounded-2xl shadow-lg w-full max-w-md mx-2 max-h-[90vh] overflow-y-auto border border-purple-100" style="box-shadow: 0 4px 24px rgba(180,70,200,0.10);">
+            <div class="p-6 md:p-8">
+                <!-- Header decorativo del modal -->
+                <div class="flex items-center mb-6 gap-3">
+                    <div class="bg-gradient-to-r from-pink-500 to-purple-500 rounded-full p-3 shadow-lg">
+                        <i class="fas fa-user-edit text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">Editar Empleado</h2>
+                    <button class="close-button ml-auto text-gray-400 hover:text-gray-600 transition-colors duration-200 text-2xl font-bold">
+                        &times;
+                    </button>
+                </div>
+
+                <form id="editarEmpleadoForm" class="space-y-6">
+                    <!-- Información personal -->
+                    <div class="grid grid-cols-2 gap-4 mb-2">
+                        <div>
+                            <label for="editNombreEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">Nombre</label>
+                            <input type="text" id="editNombreEmpleado" name="editNombreEmpleado" required autocomplete="off"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all duration-200 bg-purple-50">
+                        </div>
+                        <div>
+                            <label for="editApellidosEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">Apellidos</label>
+                            <input type="text" id="editApellidosEmpleado" name="editApellidosEmpleado" required autocomplete="off"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all duration-200 bg-purple-50">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="editCorreoEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">Correo</label>
+                        <input type="email" id="editCorreoEmpleado" name="editCorreoEmpleado" required autocomplete="off"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all duration-200 bg-purple-50">
+                    </div>
+                    <div class="mb-2">
+                        <label for="editContrasenaEmpleado" class="block text-sm font-semibold text-gray-700 mb-1">
+                            <i class="fas fa-lock mr-1 text-gray-400"></i>
+                            Nueva Contraseña <span class="text-xs text-gray-500 font-normal">(opcional)</span>
+                        </label>
+                        <input type="password" id="editContrasenaEmpleado" name="editContrasenaEmpleado" autocomplete="off" placeholder="Dejar vacío para mantener la contraseña actual"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all duration-200 bg-purple-50">
+                        <div class="flex items-center mt-1">
+                            <i class="fas fa-info-circle text-blue-400 text-xs mr-1"></i>
+                            <p class="text-xs text-gray-500">Solo completa si quieres cambiar la contraseña</p>
+                        </div>
+                    </div>
+                    <!-- Privilegios -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Privilegios:</label>
+                        <div class="bg-gradient-to-r from-purple-50 via-pink-50 to-rose-50 rounded-xl p-4 space-y-3 border border-purple-100">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Vender</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Vender" id="editPrivilegeVender">
+                                        <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Realizar apartado</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Realizar apartado" id="editPrivilegeApartado">
+                                        <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Realizar corte de caja</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Realizar corte de caja" id="editPrivilegeCorte">
+                                        <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Modificar almacén</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Modificar almacén" id="editPrivilegeAlmacen">
+                                        <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Realizar devolución</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="privilege-checkbox switch-toggle" data-privilege="Realizar devolución" id="editPrivilegeDevolucion">
+                                        <span class="w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 relative">
+                                            <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-4 pt-6">
+                        <button type="button" class="close-button px-5 py-2 bg-gray-200 text-gray-600 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-semibold">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-5 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white rounded-xl font-bold shadow-lg transition-all duration-200 transform hover:scale-105">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de empleados -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for empleado in empleados %}
+        <div class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-purple-200 overflow-hidden">
+            <!-- Header de la tarjeta con gradiente -->
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-6">
+                <div class="flex items-center">
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                        <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                            {{ empleado[1][0] }}{{ empleado[2][0] }}
+                        </span>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h3 class="text-xl font-bold text-white">{{ empleado[1] }} {{ empleado[2] }}</h3>
+                        <div class="flex items-center mt-1">
+                            <span class="bg-white bg-opacity-30 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                <i class="fas fa-user-tie mr-1"></i>
+                                Empleado
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <!-- Información con iconos en cajas -->
+                <div class="space-y-4 mb-6">
+                    <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-xl border-2 border-purple-200 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex items-center">
+                            <div class="bg-purple-600 rounded-lg p-3 mr-3 shadow-md">
+                                <i class="fas fa-envelope text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1">Correo Electrónico</p>
+                                <p class="text-sm font-semibold text-gray-800 break-all">{{ empleado[3] }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-pink-50 to-pink-100 p-4 rounded-xl border-2 border-pink-200 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex items-center">
+                            <div class="bg-pink-600 rounded-lg p-3 mr-3 shadow-md">
+                                <i class="fas fa-calendar-check text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs font-bold text-pink-700 uppercase tracking-wide mb-1">Estado</p>
+                                <p class="text-sm font-semibold text-gray-800">Miembro del equipo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones con iconos más grandes -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+                            data-user-id="{{ empleado[0] }}">
+                        <i class="fas fa-edit mr-2"></i>
+                        Editar
+                    </button>
+                    <button class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+                            data-user-id="{{ empleado[0] }}">
+                        <i class="fas fa-trash mr-2"></i>
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Mensaje cuando no hay empleados -->
+    {% if not empleados %}
+    <div class="bg-white rounded-2xl shadow-xl p-12 text-center border-2 border-purple-200">
+        <div class="mb-6">
+            <div class="inline-block bg-gradient-to-r from-purple-100 to-pink-100 rounded-full p-8 shadow-lg">
+                <i class="fas fa-users text-7xl text-purple-400"></i>
+            </div>
+        </div>
+        <h3 class="text-3xl font-bold text-gray-800 mb-3">No hay empleados registrados</h3>
+        <p class="text-gray-600 mb-8 text-lg">Comienza agregando tu primer empleado al sistema</p>
+        <button id="addFirstEmployeeBtn" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-10 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-purple-700 text-lg">
+            <i class="fas fa-user-plus mr-3 text-xl"></i>
+            Añadir Primer Empleado
+        </button>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/empleado.js') }}"></script>
+{% endblock %}
