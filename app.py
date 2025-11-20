@@ -9,13 +9,6 @@ import time #esto es para medir el tiempo de respuesta de las operaciones críti
 # Importar sistema de hashing de contraseñas
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Importar el sistema de logging de actividades
-from activity_logger import (
-    ActivityLogger, log_route_access, log_api_call, 
-    log_login, log_logout, log_product_search, 
-    log_sale, log_product_creation
-)
-
 
 # Inicializa la aplicación Flask
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static', )
@@ -23,18 +16,6 @@ app = Flask(__name__, template_folder='app/templates', static_folder='app/static
 # Configura la clave secreta desde config.py
 app.secret_key = SECRET_KEY
 
-"""
-SISTEMA DE MEDICIÓN DE RENDIMIENTO INTEGRADO
-Este sistema mide automáticamente el tiempo de respuesta de operaciones críticas.
-Objetivo: Todas las operaciones deben completarse en ≤ 2 segundos
-Operaciones monitoreadas:
-- Consultar inventario (/almacen)
-- Registrar venta (/api/registrar_venta) 
-- Login usuario (/login)
-- API productos (/api/productos)
-Ver documentación completa en: /rendimiento
-"""
-#
 def login_required(roles=None): #esto sirve para 
     def decorator(f):
         @wraps(f)
@@ -228,7 +209,6 @@ def add_user():
 
 @app.route('/punto_venta')#Esta ruta es para el apartado de punto de venta, donde solo pueden entrar los usuarios que tengan el rol 1 o 2(Jefe o empleado)
 @login_required(roles=[1, 2])  # Solo jefe (1) y empleado (2)
-@log_route_access('PUNTO_VENTA')
 def punto_venta():
     user_id = session['user_id']
     conn = get_db_connection()
@@ -253,13 +233,11 @@ def punto_venta():
 #===========================================RUTA DEL APARTADO DE VENTA========================================================
 
 @app.route('/venta')#Esta ruta es para el apartado de venta, donde solo pueden entrar los usuarios que tengan el rol 1 o 2(Jefe o empleado)
-@log_route_access('VENTA')
 def venta():
     return render_template('venta.html')   #prueba mientras se verifica la parte del dashboard  
 
 
 @app.route('/api/registrar_venta', methods=['POST'])
-@log_api_call('SALE', 'Registrar nueva venta')
 def registrar_venta():
     # ⏱️ MEDICIÓN DE RENDIMIENTO: Registrar venta debe ser ≤ 2 segundos
     tiempo_inicio = time.time()
@@ -346,7 +324,6 @@ def registrar_venta():
 
 
 @app.route('/api/productos', methods=['GET'])# Esta ruta es para obtener los productos disponibles en la base de datos
-@log_api_call('PRODUCT_SEARCH', 'Consultar productos disponibles')
 def api_productos():
     # ⏱️ MEDICIÓN DE RENDIMIENTO: Consulta de productos para POS debe ser ≤ 2 segundos
     tiempo_inicio = time.time()
@@ -379,7 +356,6 @@ def api_productos():
 
 #===========================================RUTA DEL APARTADO DE ALMACÉN========================================================
 @app.route('/almacen')# Esta ruta es para el apartado de almacén, donde solo pueden entrar los usuarios que tengan el rol 1 o 2(Jefe o empleado)
-@log_route_access('ALMACEN')
 def almacen():
     # ⏱️ MEDICIÓN DE RENDIMIENTO: Consultar inventario debe ser ≤ 2 segundos
     tiempo_inicio = time.time()
@@ -736,7 +712,6 @@ def delete_category():
 
 #===========================================RUTAS DEL APARTADO DE EMPLEADO========================================================
 @app.route('/empleado')
-@log_route_access('EMPLEADO')
 def empleado():
     try:
         # Conexión a la base de datos
