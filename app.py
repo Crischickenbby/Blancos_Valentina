@@ -1,7 +1,6 @@
-from flask import Flask, jsonify, render_template, flash, redirect, request, session
+from flask import Flask, jsonify, render_template, flash, redirect, request, session, url_for
 from config import get_db_connection, SECRET_KEY
 from functools import wraps #esto es para el decorador(un decorador es una función que toma otra función como argumento y devuelve una nueva función)
-from flask import redirect, url_for
 from datetime import datetime, timedelta
 from decimal import Decimal
 import time #esto es para medir el tiempo de respuesta de las operaciones críticas
@@ -1961,19 +1960,12 @@ def obtener_datos_corte():
 
 
 #===========================================FIN DE RUTAS DEL APARTADO DE CORTES========================================================
-#===========================================RUTAS DE ROPA========================================================
-@app.route('/ropa')#Esta ruta es para el inicio de sesión, donde la gente puede registrarse si no tiene cuenta o iniciar sesión si ya tiene cuenta
+#==========================================INICIO DE LA ROPA========================================================
+
+@app.route('/ropa')
 def ropa():
     return render_template('ropa.html')
-
-
-
-#===========================================FIN DE RUTAS DE ROPA========================================================
-
-
-# =========================================FIN DE RUTAS DE PUNTO DE VENTA====================================================
-#===========================================FIN DOCUMENTACIÓN DE RENDIMIENTO====================================================
-
+#==========================================FIN DE LA ROPA========================================================
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
