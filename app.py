@@ -10,6 +10,25 @@ import time #esto es para medir el tiempo de respuesta de las operaciones críti
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+# Función para registrar intentos de login (éxito o fallo)
+def log_login(user_id, email, success):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            '''INSERT INTO "Login_Log" ("ID_User", "Email", "Success", "Timestamp")
+               VALUES (%s, %s, %s, CURRENT_TIMESTAMP);''',
+            (user_id, email, success)
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Error al registrar log de login: {e}")
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
+
 # Inicializa la aplicación Flask
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static', )
 
