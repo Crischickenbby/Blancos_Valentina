@@ -173,13 +173,13 @@ def login():
         print(f"Error al intentar iniciar sesión: {e}")
         
         # 📝 LOG: Registrar error en login
-        ActivityLogger.log_activity(
-            action_type='LOGIN',
-            module='AUTH',
-            description=f'Error en login: {str(e)}',
-            details={'email': email, 'error': str(e)},
-            status='ERROR'
-        )
+        # ActivityLogger.log_activity(
+        #     action_type='LOGIN',
+        #     module='AUTH',
+        #     description=f'Error en login: {str(e)}',
+        #     details={'email': email, 'error': str(e)},
+        #     status='ERROR'
+        # )
         
         flash("Ocurrió un problema al intentar iniciar sesión.", "error")
         return redirect('/sesion')
