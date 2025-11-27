@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,29 +29,36 @@
         .card-3d-wrap {
             perspective: 1500px;
         }
+
         .card-3d-wrapper {
             transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
-        .card-front, .card-back {
+
+        .card-front,
+        .card-back {
             backface-visibility: hidden;
         }
+
         .card-back {
             transform: rotateY(180deg);
         }
-        #reg-log:checked ~ .card-3d-wrap .card-3d-wrapper {
+
+        #reg-log:checked~.card-3d-wrap .card-3d-wrapper {
             transform: rotateY(180deg);
         }
     </style>
     <title>Blancos Valentina - Login</title>
 </head>
-<body class="bg-gradient-to-br from-val-pink-light via-white to-val-gray min-h-screen flex items-center justify-center p-4">
+
+<body
+    class="bg-gradient-to-br from-val-pink-light via-white to-val-gray min-h-screen flex items-center justify-center p-4">
     <!-- Mensajes Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div id="flash-message" class="fixed top-4 right-4 z-50 space-y-3">
-                {% for category, message in messages %}
-                    <div class="
+    {% if messages %}
+    <div id="flash-message" class="fixed top-4 right-4 z-50 space-y-3">
+        {% for category, message in messages %}
+        <div class="
                         {% if category == 'error' %}
                             bg-gradient-to-r from-pink-400 to-pink-600 border-pink-500
                         {% elif category == 'success' %}
@@ -59,16 +67,16 @@
                             bg-gradient-to-r from-gray-200 to-gray-300 border-gray-400
                         {% endif %}
                         text-white px-6 py-4 rounded-xl shadow-2xl border min-w-[300px] max-w-md backdrop-blur-sm">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-2xl">
-                                {% if category == 'error' %}❌{% elif category == 'success' %}✅{% else %}ℹ️{% endif %}
-                            </span>
-                            <p class="font-semibold">{{ message }}</p>
-                        </div>
-                    </div>
-                {% endfor %}
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">
+                    {% if category == 'error' %}❌{% elif category == 'success' %}✅{% else %}ℹ️{% endif %}
+                </span>
+                <p class="font-semibold">{{ message }}</p>
             </div>
-        {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
     <!-- Logo/Título -->
     <div class="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
@@ -78,24 +86,23 @@
         <div class="text-center">
             <!-- Toggle entre Login y Registro -->
             <div class="inline-flex bg-gradient-to-br from-val-pink-light to-white rounded-xl p-1.5 mb-10 shadow-lg">
-                <div 
-                    class="login-tab px-8 py-3 rounded-lg font-semibold transition-all duration-300 cursor-pointer bg-gradient-to-r from-val-pink to-val-pink-dark text-white shadow-lg" 
+                <div class="login-tab px-8 py-3 rounded-lg font-semibold transition-all duration-300 cursor-pointer bg-gradient-to-r from-val-pink to-val-pink-dark text-white shadow-lg"
                     onclick="showLogin()">
                     Iniciar Sesión
                 </div>
-                <div 
-                    class="register-tab px-8 py-3 rounded-lg font-semibold transition-all duration-300 cursor-pointer text-val-pink hover:text-val-pink-dark hover:bg-val-pink-light hover:bg-opacity-80" 
+                <div class="register-tab px-8 py-3 rounded-lg font-semibold transition-all duration-300 cursor-pointer text-val-pink hover:text-val-pink-dark hover:bg-val-pink-light hover:bg-opacity-80"
                     onclick="showRegister()">
                     Registrarse
                 </div>
             </div>
-            <input class="hidden" type="checkbox" id="reg-log" name="reg-log"/>
+            <input class="hidden" type="checkbox" id="reg-log" name="reg-log" />
             <!-- Contenedor 3D -->
             <div class="card-3d-wrap relative w-full max-w-md h-[600px] mx-auto">
                 <div class="card-3d-wrapper w-full h-full absolute">
                     <!-- CARD FRONT - Login -->
                     <div class="card-front w-full h-full absolute">
-                        <div class="bg-gradient-to-br from-val-pink-light to-white rounded-3xl shadow-2xl border border-pink-200 p-10 h-full flex flex-col justify-center">
+                        <div
+                            class="bg-gradient-to-br from-val-pink-light to-white rounded-3xl shadow-2xl border border-pink-200 p-10 h-full flex flex-col justify-center">
                             <div class="mb-8">
                                 <h4 class="text-3xl font-bold text-val-pink mb-2">Bienvenido</h4>
                                 <p class="text-gray-500">Ingresa tus credenciales para continuar</p>
@@ -103,25 +110,27 @@
                             <!--primer formulario-->
                             <form action="/login" method="POST" class="space-y-6">
                                 <div>
-                                    <label class="text-gray-700 text-sm font-semibold mb-2 block">Correo Electrónico</label>
-                                    <input 
-                                        type="email" 
-                                        name="Email_sesion" 
-                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5" 
-                                        placeholder="tucorreo@ejemplo.com"
-                                        required>
-                                </div>    
+                                    <label class="text-gray-700 text-sm font-semibold mb-2 block">Correo
+                                        Electrónico</label>
+                                    <input type="email" name="Email_sesion"
+                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5"
+                                        placeholder="tucorreo@ejemplo.com" required>
+                                </div>
                                 <div>
                                     <label class="text-gray-700 text-sm font-semibold mb-2 block">Contraseña</label>
-                                    <input 
-                                        type="password" 
-                                        name="Password_sesion" 
-                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5" 
-                                        placeholder="••••••••"
-                                        required>
+                                    <div class="relative">
+                                        <input type="password" name="Password_sesion" id="login-password"
+                                            class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5 pr-12"
+                                            placeholder="••••••••" required>
+                                        <button type="button" tabindex="-1" onclick="togglePassword('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-val-pink focus:outline-none">
+                                            <svg id="login-eye" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                                <button 
-                                    type="submit" 
+                                <button type="submit"
                                     class="w-full bg-gradient-to-r from-val-pink to-val-pink-dark hover:from-val-pink-dark hover:to-pink-900 text-white font-bold py-4 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-lg">
                                     Iniciar Sesión
                                 </button>
@@ -131,7 +140,8 @@
                     </div>
                     <!-- CARD BACK - Registro -->
                     <div class="card-back w-full h-full absolute">
-                        <div class="bg-gradient-to-br from-val-pink-light to-white rounded-3xl shadow-2xl border border-pink-200 p-10 h-full flex flex-col justify-center">
+                        <div
+                            class="bg-gradient-to-br from-val-pink-light to-white rounded-3xl shadow-2xl border border-pink-200 p-10 h-full flex flex-col justify-center">
                             <div class="mb-6">
                                 <h4 class="text-3xl font-bold text-val-pink mb-2">Crear Cuenta</h4>
                                 <p class="text-gray-500">Completa el formulario para registrarte</p>
@@ -140,42 +150,45 @@
                             <form action="/add_user" method="POST" class="space-y-4">
                                 <div>
                                     <label class="text-gray-700 text-sm font-semibold mb-2 block">Nombre(s)</label>
-                                    <input 
-                                        type="text" 
-                                        name="fullname" 
-                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5" 
-                                        placeholder="Juan"
-                                        required>
-                                </div>    
+                                    <input type="text" name="fullname"
+                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5"
+                                        placeholder="Juan" required>
+                                </div>
                                 <div>
                                     <label class="text-gray-700 text-sm font-semibold mb-2 block">Apellidos</label>
-                                    <input 
-                                        type="text" 
-                                        name="last_name" 
-                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5" 
-                                        placeholder="Pérez García"
-                                        required>
-                                </div>    
+                                    <input type="text" name="last_name"
+                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5"
+                                        placeholder="Pérez García" required>
+                                </div>
                                 <div>
-                                    <label class="text-gray-700 text-sm font-semibold mb-2 block">Correo Electrónico</label>
-                                    <input 
-                                        type="email" 
-                                        name="email" 
-                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5" 
-                                        placeholder="tucorreo@ejemplo.com"
-                                        required>
+                                    <label class="text-gray-700 text-sm font-semibold mb-2 block">Correo
+                                        Electrónico</label>
+                                    <input type="email" name="email"
+                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5"
+                                        placeholder="tucorreo@ejemplo.com" required>
                                 </div>
                                 <div>
                                     <label class="text-gray-700 text-sm font-semibold mb-2 block">Contraseña</label>
-                                    <input 
-                                        type="password" 
-                                        name="password" 
-                                        class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5" 
-                                        placeholder="••••••••"
-                                        required>
+                                    <div class="relative">
+                                        <input type="password" name="password" id="register-password"
+                                            class="w-full bg-white text-gray-900 border-2 border-pink-200 rounded-xl px-4 py-3 focus:outline-none focus:border-val-pink focus:ring-4 focus:ring-val-pink focus:ring-opacity-20 transition-all duration-300 hover:-translate-y-0.5 pr-12"
+                                            placeholder="••••••••" required
+                                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':\"\\|,.</?]).{8,}$"
+                                            title="La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo."
+                                        />
+                                        <button type="button" tabindex="-1" onclick="togglePassword('register-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-val-pink focus:outline-none">
+                                            <svg id="register-eye" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                        </div>
+                                    <p id="password-error" class="text-pink-600 text-xs mt-1 hidden">
+                                        La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un
+                                        número y un símbolo.
+                                    </p>
                                 </div>
-                                <button 
-                                    type="submit" 
+                                <button type="submit"
                                     class="w-full bg-gradient-to-r from-val-pink to-val-pink-dark hover:from-val-pink-dark hover:to-pink-900 text-white font-bold py-4 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-lg mt-2">
                                     Registrarse
                                 </button>
@@ -202,15 +215,44 @@
             loginTab.className = 'login-tab px-8 py-3 rounded-lg font-semibold transition-all duration-300 cursor-pointer text-val-pink hover:text-val-pink-dark hover:bg-val-pink-light hover:bg-opacity-80';
         }
     </script>
-        <script>
-            setTimeout(function() {
-                const flash = document.getElementById('flash-message');
-                if (flash) {
-                    flash.style.transition = "opacity 0.5s";
-                    flash.style.opacity = 0;
-                    setTimeout(() => flash.remove(), 500);
+    <script>
+        // Mostrar/ocultar contraseña (función global, solo una vez)
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const svg = btn.querySelector('svg');
+            if (input.type === 'password') {
+                input.type = 'text';
+                svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m1.414-1.414A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.965 9.965 0 01-4.293 5.032M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />';
+            } else {
+                input.type = 'password';
+                svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />\n<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+            }
+        }
+        // Validación en tiempo real de la contraseña de registro
+        const passwordInput = document.getElementById('register-password');
+        const passwordError = document.getElementById('password-error');
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function () {
+                const value = passwordInput.value;
+                const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+                if (!strongRegex.test(value)) {
+                    passwordError.classList.remove('hidden');
+                } else {
+                    passwordError.classList.add('hidden');
                 }
-            }, 3000);
-        </script>
+            });
+        }
+    </script>
+    <script>
+        setTimeout(function () {
+            const flash = document.getElementById('flash-message');
+            if (flash) {
+                flash.style.transition = "opacity 0.5s";
+                flash.style.opacity = 0;
+                setTimeout(() => flash.remove(), 500);
+            }
+        }, 3000);
+    </script>
 </body>
+
 </html>

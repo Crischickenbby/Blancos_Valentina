@@ -113,6 +113,8 @@ document.addEventListener('change', function(event) {
 // Validación de formulario
 document.getElementById('crearEmpleadoForm')?.addEventListener('submit', async function (event) {
     event.preventDefault(); // Evitar el envío por defecto del formulario
+    const submitBtn = this.querySelector('button[type="submit"]');
+    if (submitBtn && submitBtn.disabled) return;
 
     const nombre = document.getElementById('nombreEmpleado').value.trim();
     const apellidos = document.getElementById('apellidosEmpleado').value.trim();
@@ -121,8 +123,13 @@ document.getElementById('crearEmpleadoForm')?.addEventListener('submit', async f
     const privilegios = privilegeInput?.value; // Lista separada por comas
 
     if (!nombre || !apellidos || !correo || !contrasena || !privilegios) {
-        alert('Por favor, completa todos los campos y selecciona al menos un privilegio.');
+        showFlashMessage('Por favor, completa todos los campos y selecciona al menos un privilegio.', 'error');
         return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
     }
 
     // Enviar los datos al servidor
@@ -143,14 +150,22 @@ document.getElementById('crearEmpleadoForm')?.addEventListener('submit', async f
 
         const result = await response.json();
         if (result.success) {
-            alert(result.message);
-            location.reload(); // Recargar la página para actualizar la lista de empleados
+            showFlashMessage(result.message, 'success');
+            setTimeout(() => location.reload(), 1200);
         } else {
-            alert(`Error: ${result.message}`);
+            showFlashMessage(`Error: ${result.message}`, 'error');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
         }
     } catch (error) {
         console.error('Error al enviar los datos:', error);
-        alert('Ocurrió un error al crear el empleado.');
+        showFlashMessage('Ocurrió un error al crear el empleado.', 'error');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
     }
 });
 
@@ -173,14 +188,14 @@ document.addEventListener('click', async function(event) {
 
                 const result = await response.json();
                 if (result.success) {
-                    alert(result.message);
-                    location.reload(); // Recargar la página para actualizar la lista de empleados
+                    showFlashMessage(result.message, 'success');
+                    setTimeout(() => location.reload(), 1200);
                 } else {
-                    alert(`Error: ${result.message}`);
+                    showFlashMessage(`Error: ${result.message}`, 'error');
                 }
             } catch (error) {
                 console.error('Error al eliminar el empleado:', error);
-                alert('Ocurrió un error al eliminar el empleado.');
+                showFlashMessage('Ocurrió un error al eliminar el empleado.', 'error');
             }
         }
     }
@@ -198,7 +213,7 @@ document.getElementById('editarEmpleadoForm').addEventListener('submit', async f
     
     // Validar campos obligatorios (la contraseña es opcional)
     if (!nombre || !apellidos || !correo) {
-        alert('Por favor, completa todos los campos obligatorios (Nombre, Apellidos, Correo).');
+        showFlashMessage('Por favor, completa todos los campos obligatorios (Nombre, Apellidos, Correo).', 'error');
         return;
     }
     
@@ -234,14 +249,14 @@ document.getElementById('editarEmpleadoForm').addEventListener('submit', async f
 
         const result = await response.json();
         if (result.success) {
-            alert(result.message);
-            location.reload(); // Recargar la página para reflejar los cambios
+            showFlashMessage(result.message, 'success');
+            setTimeout(() => location.reload(), 1200);
         } else {
-            alert(`Error: ${result.message}`);
+            showFlashMessage(`Error: ${result.message}`, 'error');
         }
     } catch (error) {
         console.error('Error al editar el empleado:', error);
-        alert('Ocurrió un error al editar el empleado.');
+        showFlashMessage('Ocurrió un error al editar el empleado.', 'error');
     }
 });
 

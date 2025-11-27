@@ -14,6 +14,31 @@
 </head>
 
 <body class="bg-white">
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div id="flash-message" class="fixed top-4 right-4 z-50 space-y-3">
+      {% for category, message in messages %}
+      <div class="
+              {% if category == 'error' %}
+                bg-gradient-to-r from-pink-400 to-pink-600 border-pink-500
+              {% elif category == 'success' %}
+                bg-gradient-to-r from-sky-400 to-sky-600 border-sky-500
+              {% else %}
+                bg-gradient-to-r from-gray-200 to-gray-300 border-gray-400
+              {% endif %}
+              text-white px-6 py-4 rounded-xl shadow-2xl border min-w-[300px] max-w-md backdrop-blur-sm">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl">
+            {% if category == 'error' %}{% elif category == 'success' %}{% else %}ℹ{% endif %}
+          </span>
+          <p class="font-semibold">{{ message }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
   <nav class="bg-white shadow-md border-b border-gray-200 font-serif">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
@@ -170,6 +195,16 @@
         </div>
       </div>
     </footer>
+    <script>
+      setTimeout(function () {
+        const flash = document.getElementById('flash-message');
+        if (flash) {
+          flash.style.transition = "opacity 0.5s";
+          flash.style.opacity = 0;
+          setTimeout(() => flash.remove(), 500);
+        }
+      }, 3000);
+    </script>
   </main>
    
 </body>
