@@ -149,14 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Guardar nuevo apartado
     formApartado.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+        const submitBtn = formApartado.querySelector('button[type="submit"]');
+        if (submitBtn && submitBtn.disabled) return;
         // Verificar caja abierta antes de proceder
         const cajaAbierta = await verificarCajaAbierta();
         if (!cajaAbierta) {
-            alert('⚠️ No se puede crear un apartado sin tener la caja abierta.\n\nPor favor, abra la caja desde el módulo de "Corte de Caja" antes de continuar.');
+            alert('\u26a0\ufe0f No se puede crear un apartado sin tener la caja abierta.\n\nPor favor, abra la caja desde el módulo de "Corte de Caja" antes de continuar.');
             return;
         }
-        
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+        }
         const nombre = document.getElementById('nombre-cliente').value.trim();
         const apellido = document.getElementById('apellido-cliente').value.trim();
         const telefono = document.getElementById('telefono-cliente').value.trim();
@@ -167,22 +171,38 @@ document.addEventListener('DOMContentLoaded', () => {
         // Validaciones
         if (!nombre || !apellido || !telefono) {
             alert('Por favor complete todos los campos del cliente');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
             return;
         }
 
         if (!productoId) {
             alert('Debe seleccionar un producto');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
             return;
         }
 
         if (isNaN(montoInicial) || montoInicial <= 0) {
             alert('Ingrese un monto válido');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
             return;
         }
 
         // Validar que el teléfono tenga al menos 8 dígitos
         if (telefono.length < 8 || !/^\d+$/.test(telefono)) {
             alert('El teléfono debe tener al menos 8 dígitos y solo números');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
             return;
         }
 
@@ -216,10 +236,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 location.reload();
             } else {
                 alert(data.message || 'Error al guardar el apartado');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                }
             }
         } catch (error) {
             console.error('Error:', error);
             alert(`Error: ${error.message}`);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
         }
     });
 

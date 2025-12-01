@@ -1,7 +1,6 @@
-from flask import Flask, jsonify, render_template, flash, redirect, request, session
+from flask import Flask, jsonify, render_template, flash, redirect, request, session, url_for
 from config import get_db_connection, SECRET_KEY
 from functools import wraps #esto es para el decorador(un decorador es una función que toma otra función como argumento y devuelve una nueva función)
-from flask import redirect, url_for
 from datetime import datetime, timedelta
 from decimal import Decimal
 import time #esto es para medir el tiempo de respuesta de las operaciones críticas
@@ -35,9 +34,17 @@ app = Flask(__name__, template_folder='app/templates', static_folder='app/static
 # Configura la clave secreta desde config.py
 app.secret_key = SECRET_KEY
 
+
+# Ruta para cerrar sesión
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Sesión cerrada correctamente.', 'success')
+    return redirect(url_for('home'))
+
 def login_required(roles=None): #esto sirve para 
     def decorator(f):
-        @wraps(f)
+        @wraps(f)#esto es para que la función decorada mantenga su nombre y docstring originales lo del parentésis es para que funcione bien con cualquier función
         def wrapped(*args, **kwargs):
             if 'user_id' not in session:
                 flash("Debes iniciar sesión primero.", "error") 
@@ -53,7 +60,7 @@ def login_required(roles=None): #esto sirve para
                 cur.close()
                 conn.close() 
 
-                if not result or result[0] not in roles:
+                if not result or result[0] not in roles:#esto es para verificar si el rol del usuario está en la lista de roles permitidos, el rol permitidoes el que se pasa como argumento al decorador
                     flash("No tienes permiso para acceder a esta página.", "error")
                     print("ACCESO DENEGADO. Rol no permitido.")
                     return redirect(url_for('home'))
@@ -149,8 +156,6 @@ def login():
             duration_ms = int(tiempo_respuesta * 1000)
             print(f" RENDIMIENTO - Login exitoso: {tiempo_respuesta:.3f} segundos {'OK' if tiempo_respuesta <= 2 else 'LENTO'}")
 
-            # 📝 LOG: Registrar login exitoso
-            log_login(user[0], email, success=True)
 
             if user_role == 3:
                 flash("¡Inicio de sesión exitoso!", "success")
@@ -163,23 +168,13 @@ def login():
             tiempo_respuesta = tiempo_fin - tiempo_inicio
             print(f" RENDIMIENTO - Login fallido: {tiempo_respuesta:.3f} segundos {'OK' if tiempo_respuesta <= 2 else 'LENTO'}")
             
-            # 📝 LOG: Registrar intento de login fallido
-            log_login(None, email, success=False)
+        
             
             flash("Correo o contraseña incorrectos.", "error")
             return redirect('/sesion')
 
     except Exception as e:
         print(f"Error al intentar iniciar sesión: {e}")
-        
-        # 📝 LOG: Registrar error en login
-        # ActivityLogger.log_activity(
-        #     action_type='LOGIN',
-        #     module='AUTH',
-        #     description=f'Error en login: {str(e)}',
-        #     details={'email': email, 'error': str(e)},
-        #     status='ERROR'
-        # )
         
         flash("Ocurrió un problema al intentar iniciar sesión.", "error")
         return redirect('/sesion')
@@ -252,11 +247,13 @@ def punto_venta():
 #===========================================RUTA DEL APARTADO DE VENTA========================================================
 
 @app.route('/venta')#Esta ruta es para el apartado de venta, donde solo pueden entrar los usuarios que tengan el rol 1 o 2(Jefe o empleado)
+@login_required(roles=[1, 2])
 def venta():
     return render_template('venta.html')   #prueba mientras se verifica la parte del dashboard  
 
 
 @app.route('/api/registrar_venta', methods=['POST'])
+@login_required(roles=[1, 2])
 def registrar_venta():
     # ⏱️ MEDICIÓN DE RENDIMIENTO: Registrar venta debe ser ≤ 2 segundos
     tiempo_inicio = time.time()
@@ -343,6 +340,7 @@ def registrar_venta():
 
 
 @app.route('/api/productos', methods=['GET'])# Esta ruta es para obtener los productos disponibles en la base de datos
+@login_required(roles=[1, 2])
 def api_productos():
     # ⏱️ MEDICIÓN DE RENDIMIENTO: Consulta de productos para POS debe ser ≤ 2 segundos
     tiempo_inicio = time.time()
@@ -375,6 +373,7 @@ def api_productos():
 
 #===========================================RUTA DEL APARTADO DE ALMACÉN========================================================
 @app.route('/almacen')# Esta ruta es para el apartado de almacén, donde solo pueden entrar los usuarios que tengan el rol 1 o 2(Jefe o empleado)
+@login_required(roles=[1, 2])
 def almacen():
     # ⏱️ MEDICIÓN DE RENDIMIENTO: Consultar inventario debe ser ≤ 2 segundos
     tiempo_inicio = time.time()
@@ -429,6 +428,7 @@ def almacen():
 
 
 @app.route('/eliminar_producto/<int:product_id>', methods=['PUT'])
+@login_required(roles=[1, 2])
 def eliminar_producto(product_id):
     print(f"Petición recibida para eliminar el producto con ID: {product_id}")  # Depuración
     try:
@@ -455,7 +455,7 @@ def eliminar_producto(product_id):
 
 
 @app.route('/agregar_producto', methods=['POST'])
-
+@login_required(roles=[1, 2])
 def agregar_producto():
     try:
         # Obtener datos del formulario
@@ -487,7 +487,7 @@ def agregar_producto():
             conn.close()
 
 @app.route('/incrementar_cantidad_producto', methods=['POST'])
-
+@login_required(roles=[1, 2])
 def incrementar_cantidad_producto():
     try:
         data = request.get_json()
@@ -519,7 +519,7 @@ def incrementar_cantidad_producto():
             conn.close()
 
 @app.route('/reducir_cantidad_producto', methods=['POST'])
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def reducir_cantidad_producto():
     try:
         data = request.get_json()
@@ -558,7 +558,7 @@ def reducir_cantidad_producto():
             conn.close()
 
 @app.route('/actualizar_producto', methods=['POST'])
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def actualizar_producto():
     conn = None
     try:
@@ -601,6 +601,7 @@ def actualizar_producto():
             conn.close()
 
 @app.route('/reducir_stock/<int:product_id>', methods=['PUT'])
+@login_required(roles=[1, 2])
 def reducir_stock(product_id):
     """Reducir stock de un producto específico"""
     try:
@@ -650,7 +651,7 @@ def reducir_stock(product_id):
             conn.close()
 
 @app.route('/add_category', methods=['POST'])
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def add_category():
     try:
         data = request.get_json()
@@ -690,7 +691,7 @@ def add_category():
             conn.close()
 
 @app.route('/delete_category', methods=['POST'])
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def delete_category():
     try:
         data = request.get_json()
@@ -731,6 +732,7 @@ def delete_category():
 
 #===========================================RUTAS DEL APARTADO DE EMPLEADO========================================================
 @app.route('/empleado')
+@login_required(roles=[1])  # Solo jefe (1)
 def empleado():
     try:
         # Conexión a la base de datos
@@ -760,6 +762,7 @@ def empleado():
             conn.close()
 
 @app.route('/crear_empleado', methods=['POST'])
+@login_required(roles=[1])  # Solo jefe (1)
 def crear_empleado():
     try:
         # Obtener datos del formulario
@@ -822,6 +825,7 @@ def crear_empleado():
             conn.close()
 
 @app.route('/eliminar_empleado/<int:user_id>', methods=['PUT'])
+@login_required(roles=[1])  # Solo jefe (1)
 def eliminar_empleado(user_id):
     try:
         # Conexión a la base de datos
@@ -847,6 +851,7 @@ def eliminar_empleado(user_id):
             conn.close()
 
 @app.route('/editar_empleado/<int:user_id>', methods=['PUT'])
+@login_required(roles=[1])  # Solo jefe (1)
 def editar_empleado(user_id):
     try:
         # Obtener datos del formulario
@@ -910,6 +915,7 @@ def editar_empleado(user_id):
             conn.close()
 
 @app.route('/obtener_empleado/<int:user_id>', methods=['GET'])
+@login_required(roles=[1])  # Solo jefe (1)
 def obtener_empleado(user_id):
     try:
         print(f"Obteniendo información del empleado con ID: {user_id}")  # Depuración
@@ -969,12 +975,12 @@ def obtener_empleado(user_id):
 #===========================================RUTAS DEL APARTADO DE DEVOLUCIÓN========================================================
 
 @app.route('/devolucion')
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def devolucion():
     return render_template('devolucion.html')   #prueba mientras se verifica la parte del dashboard 
 
 @app.route('/api/registrar_devolucion', methods=['POST'])
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def registrar_devolucion():
     data = request.get_json()
     if not data or 'id_venta' not in data:
@@ -1066,8 +1072,9 @@ def registrar_devolucion():
 
 
 
+
 @app.route('/api/buscar_venta')
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def buscar_venta():
     buscar = request.args.get('buscar')
     fecha = request.args.get('fecha')
@@ -1177,8 +1184,9 @@ def buscar_venta():
 
 #===========================================RUTAS DEL APARTADO DE APARTADO========================================================
 
+
 @app.route('/apartado')
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def apartado():
     conn = get_db_connection()
     cur = conn.cursor()
@@ -1221,6 +1229,7 @@ def apartado():
 
 #este apartado es para buscar los productos al momento de crear un apartado 
 @app.route('/api/buscar_productos')
+@login_required(roles=[1, 2])
 def buscar_productos():
     query = request.args.get('q', '')
     if query:
@@ -1263,6 +1272,7 @@ def buscar_productos():
 
 #esto es para darle al boton de crear apartado y guardalo, no mover nada de esto porque ya sirve
 @app.route('/api/crear_apartado', methods=['POST'])
+@login_required(roles=[1, 2])
 def crear_apartado():
     try:
         data = request.get_json()
@@ -1377,6 +1387,7 @@ def crear_apartado():
 
 
 @app.route('/api/historial_pagos_apartado', methods=['GET'])
+@login_required(roles=[1, 2])
 def historial_pagos_apartado():
     id_layaway = request.args.get('id_layaway')
     
@@ -1441,6 +1452,7 @@ def historial_pagos_apartado():
 
 
 @app.route('/api/realizar_pago', methods=['POST'])
+@login_required(roles=[1, 2])
 def realizar_pago():
     data = request.get_json()
     id_layaway = data.get('id_layaway')
@@ -1584,6 +1596,7 @@ def realizar_pago():
 
 
 @app.route('/api/cancelar_apartado', methods=['POST'])
+@login_required(roles=[1, 2])
 def cancelar_apartado():
     data = request.get_json()
     id_layaway = data.get('id_layaway')
@@ -1703,12 +1716,13 @@ def cancelar_apartado():
 
 # Página del corte de caja
 @app.route('/corte')
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def corte():
     return render_template('corte.html')
 
 #Para saber si hay una caja abierta o no
 @app.route('/api/caja/estado', methods=['GET'])
+@login_required(roles=[1, 2])
 def estado_caja():
     try:
         conn = get_db_connection()
@@ -1746,7 +1760,7 @@ def estado_caja():
 
 #Para abrir la caja
 @app.route('/api/caja/abrir', methods=['POST'])
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def abrir_caja():
     try:
         conn = get_db_connection()
@@ -1803,6 +1817,7 @@ def abrir_caja():
         conn.close()
 
 @app.route('/api/caja/cerrar', methods=['POST'])
+@login_required(roles=[1, 2])
 def cerrar_caja():
     data = request.json
     efectivo_contado = data.get('efectivo_contado')
@@ -1890,7 +1905,7 @@ def cerrar_caja():
         conn.close()
 
 @app.route('/api/caja/datos-corte', methods=['GET'])
-#SE REMPLEAZO MIENTRAS
+@login_required(roles=[1, 2])
 def obtener_datos_corte():
     try:
         conn = get_db_connection()
@@ -1992,90 +2007,13 @@ def obtener_datos_corte():
 
 
 #===========================================FIN DE RUTAS DEL APARTADO DE CORTES========================================================
-#===========================================RUTAS DE ROPA========================================================
-@app.route('/ropa')#Esta ruta es para el inicio de sesión, donde la gente puede registrarse si no tiene cuenta o iniciar sesión si ya tiene cuenta
+#==========================================INICIO DE LA ROPA========================================================
+
+@app.route('/ropa')
+@login_required(roles=[1, 2])
 def ropa():
     return render_template('ropa.html')
-
-
-
-#===========================================FIN DE RUTAS DE ROPA========================================================
-
-
-# =========================================FIN DE RUTAS DE PUNTO DE VENTA====================================================
-
-#===========================================RUTA PARA DOCUMENTACIÓN DE RENDIMIENTO========================================================
-
-@app.route('/rendimiento')
-def rendimiento():
-    """
-     DOCUMENTACIÓN DE RENDIMIENTO DEL SISTEMA
-    
-    Operaciones críticas que deben completarse en ≤ 2 segundos:
-    
-    ✅ Consultar inventario (almacén)
-    ✅ Registrar venta 
-    ✅ Login de usuario
-    ✅ API de productos (punto de venta)
-    ✅ Consultar apartados
-    ✅ Abrir/cerrar caja
-    
-    El sistema mide automáticamente estos tiempos y los reporta en la consola.
-    Formato: " RENDIMIENTO - [Operación]: [tiempo]s ✅/⚠️"
-    """
-    
-    rendimiento_info = {
-        "objetivo_tiempo": "≤ 2 segundos",
-        "operaciones_criticas": [
-            {
-                "operacion": "Consultar inventario",
-                "ruta": "/almacen",
-                "descripcion": "Cargar lista completa de productos y categorías"
-            },
-            {
-                "operacion": "Registrar venta",
-                "ruta": "/api/registrar_venta",
-                "descripcion": "Procesar venta completa con actualización de stock y caja"
-            },
-            {
-                "operacion": "Login usuario",
-                "ruta": "/login", 
-                "descripcion": "Autenticación y redirección según rol"
-            },
-            {
-                "operacion": "API productos",
-                "ruta": "/api/productos",
-                "descripcion": "Obtener productos disponibles para punto de venta"
-            },
-            {
-                "operacion": "Consultar apartados",
-                "ruta": "/apartado",
-                "descripcion": "Cargar lista de apartados activos"
-            },
-            {
-                "operacion": "Operaciones de caja",
-                "ruta": "/api/caja/*",
-                "descripcion": "Abrir, cerrar caja y consultar datos de corte"
-            }
-        ],
-        "como_monitorear": [
-            "Los tiempos se muestran automáticamente en la consola del servidor",
-            "Formato:  RENDIMIENTO - [Operación]: [tiempo]s ✅/⚠️",
-            "✅ = Cumple objetivo (≤ 2s)",
-            "⚠️ LENTO = Excede objetivo (> 2s)"
-        ],
-        "optimizaciones": [
-            "Consultas SQL optimizadas con índices apropiados",
-            "Conexiones de base de datos eficientes",
-            "Validación de datos antes de operaciones BD",
-            "Manejo de errores sin timeouts innecesarios"
-        ]
-    }
-    
-    return jsonify(rendimiento_info)
-
-#===========================================FIN DOCUMENTACIÓN DE RENDIMIENTO====================================================
-
+#==========================================FIN DE LA ROPA========================================================
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

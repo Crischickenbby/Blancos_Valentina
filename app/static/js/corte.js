@@ -137,102 +137,161 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function abrirCaja() {
+        if (elementos.btnAbrir.disabled) return;
         const monto = parseFloat(elementos.montoInicial.value) || 0;
 
         if (!monto || monto <= 0) {
-            alert('Ingrese un monto válido mayor a cero');
+            showFlashMessage('Ingrese un monto válido mayor a cero', 'error');
             return;
         }
 
-        if (!confirm(`¿Desea abrir la caja con un monto inicial de $${monto.toFixed(2)}?`)) {
-            return;
-        }
+        // Modal de confirmación visual
+        const confirmModal = document.createElement('div');
+        confirmModal.id = 'modal-confirm-abrir-caja';
+        confirmModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40';
+        confirmModal.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full border-2 border-green-400 animate-fade-in">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-lock-open text-green-600 text-3xl"></i>
+                    <h3 class="text-xl font-bold text-gray-800">¿Abrir caja?</h3>
+                </div>
+                <p class="text-gray-700 mb-6">¿Desea abrir la caja con un monto inicial de <span class='font-bold text-green-700'>$${monto.toFixed(2)}</span>?</p>
+                <div class="flex justify-end gap-4">
+                    <button id="cancelar-abrir-caja" class="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">Cancelar</button>
+                    <button id="confirmar-abrir-caja" class="px-5 py-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white font-bold hover:from-green-600 hover:to-green-700 transition">Sí, abrir caja</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(confirmModal);
 
-        try {
-            elementos.btnAbrir.disabled = true;
-            elementos.btnAbrir.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        return new Promise((resolve) => {
+            document.getElementById('cancelar-abrir-caja').onclick = () => {
+                confirmModal.remove();
+                resolve(false);
+            };
+            document.getElementById('confirmar-abrir-caja').onclick = async () => {
+                confirmModal.remove();
+                // --- Acción real de abrir caja ---
+                try {
+                    elementos.btnAbrir.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
 
-            const response = await fetch('/api/caja/abrir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ monto: monto })
-            });
+                    const response = await fetch('/api/caja/abrir', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ monto: monto })
+                    });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al abrir caja');
-            }
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Error al abrir caja');
+                    }
 
-            const result = await response.json();
+                    const result = await response.json();
 
-            if (result.success) {
-                await verificarEstadoCaja();
-                elementos.montoInicial.value = '';
-                mostrarNotificacion('success', 'Caja abierta correctamente');
-            } else {
-                throw new Error(result.error || result.message || 'Error al abrir caja');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            mostrarNotificacion('error', error.message);
-        } finally {
-            elementos.btnAbrir.disabled = false;
-            elementos.btnAbrir.innerHTML = '<i class="fas fa-lock-open"></i> Abrir Caja';
-        }
+                    if (result.success) {
+                        await verificarEstadoCaja();
+                        elementos.montoInicial.value = '';
+                        mostrarNotificacion('success', 'Caja abierta correctamente');
+                        // Habilitar botón de cerrar caja por si quedó bloqueado
+                        if (elementos.btnCerrar) {
+                        }
+                    } else {
+                        throw new Error(result.error || result.message || 'Error al abrir caja');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    mostrarNotificacion('error', error.message);
+                    elementos.btnAbrir.disabled = false;
+                    elementos.btnAbrir.classList.remove('opacity-60', 'cursor-not-allowed');
+                } finally {
+                    elementos.btnAbrir.innerHTML = '<i class="fas fa-lock-open"></i> Abrir Caja';
+                }
+                resolve(true);
+            };
+        });
     }
 
     async function cerrarCaja() {
+        if (elementos.btnCerrar.disabled) return;
         const efectivoContado = parseFloat(elementos.efectivoContado.value) || 0;
         const observaciones = elementos.observaciones.value;
-        
+
         if (!efectivoContado || efectivoContado < 0) {
             mostrarNotificacion('error', 'Ingrese un monto válido para el efectivo contado');
             return;
         }
 
-        if (!confirm('¿Está seguro que desea cerrar la caja?')) {
-            return;
-        }
+        // Modal de confirmación visual
+        const confirmModal = document.createElement('div');
+        confirmModal.id = 'modal-confirm-cerrar-caja';
+        confirmModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40';
+        confirmModal.innerHTML = `
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full border-2 border-pink-400 animate-fade-in">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-lock text-pink-600 text-3xl"></i>
+                    <h3 class="text-xl font-bold text-gray-800">¿Cerrar caja?</h3>
+                </div>
+                <p class="text-gray-700 mb-6">¿Estás seguro que deseas cerrar la caja? Esta acción no se puede deshacer.</p>
+                <div class="flex justify-end gap-4">
+                    <button id="cancelar-cerrar-caja" class="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">Cancelar</button>
+                    <button id="confirmar-cerrar-caja" class="px-5 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold hover:from-red-600 hover:to-pink-700 transition">Sí, cerrar caja</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(confirmModal);
 
-        try {
-            elementos.btnCerrar.disabled = true;
-            elementos.btnCerrar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cerrando caja...';
+        return new Promise((resolve) => {
+            document.getElementById('cancelar-cerrar-caja').onclick = () => {
+                confirmModal.remove();
+                resolve(false);
+            };
+            document.getElementById('confirmar-cerrar-caja').onclick = async () => {
+                confirmModal.remove();
+                // --- Acción real de cierre de caja ---
+                try {
+                    elementos.btnCerrar.disabled = true;
+                    elementos.btnCerrar.classList.add('opacity-60', 'cursor-not-allowed');
+                    elementos.btnCerrar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cerrando caja...';
 
-            // Calcular diferencia
-            const efectivoEsperadoText = elementos.totalEfectivo.textContent.replace('$', '');
-            const efectivoEsperado = parseFloat(efectivoEsperadoText) || 0;
-            const diferencia = efectivoEsperado - efectivoContado;
+                    // Calcular diferencia
+                    const efectivoEsperadoText = elementos.totalEfectivo.textContent.replace('$', '');
+                    const efectivoEsperado = parseFloat(efectivoEsperadoText) || 0;
+                    const diferencia = efectivoEsperado - efectivoContado;
 
-            const response = await fetch('/api/caja/cerrar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    efectivo_contado: efectivoContado,
-                    diferencia: diferencia,
-                    observaciones: observaciones
-                })
-            });
+                    const response = await fetch('/api/caja/cerrar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            efectivo_contado: efectivoContado,
+                            diferencia: diferencia,
+                            observaciones: observaciones
+                        })
+                    });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al cerrar caja');
-            }
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Error al cerrar caja');
+                    }
 
-            const result = await response.json();
+                    const result = await response.json();
 
-            if (result.message) {
-                mostrarNotificacion('success', result.message);
-                await verificarEstadoCaja();
-            } else {
-                throw new Error('Error al procesar el cierre de caja');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            mostrarNotificacion('error', error.message);
-        } finally {
-            elementos.btnCerrar.disabled = false;
-            elementos.btnCerrar.innerHTML = '<i class="fas fa-lock"></i> Cerrar Caja';
-        }
+                    if (result.message) {
+                        mostrarNotificacion('success', result.message);
+                        await verificarEstadoCaja();
+                    } else {
+                        throw new Error('Error al procesar el cierre de caja');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    mostrarNotificacion('error', error.message);
+                    elementos.btnCerrar.disabled = false;
+                    elementos.btnCerrar.classList.remove('opacity-60', 'cursor-not-allowed');
+                } finally {
+                    elementos.btnCerrar.innerHTML = '<i class="fas fa-lock"></i> Cerrar Caja';
+                }
+                resolve(true);
+            };
+        });
     }
 
     async function actualizarDatosCorteCaja() {
@@ -253,8 +312,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 elementos.egresosEfectivo.textContent = formatCurrency(data.egresos_efectivo);
                 elementos.totalEfectivo.textContent = formatCurrency(data.total_efectivo);
                 elementos.ingresosTarjetas.textContent = formatCurrency(data.ingresos_tarjetas);
-                elementos.egresosTarjetas.textContent = formatCurrency(data.egresos_tarjetas);
-                elementos.ingresosTransferencias.textContent = formatCurrency(data.ingresos_transferencias);
                 elementos.egresosTransferencias.textContent = formatCurrency(data.egresos_transferencias);
                 elementos.gananciaGeneral.textContent = formatCurrency(data.ganancia_general);
                 
@@ -269,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function mostrarNotificacion(tipo, mensaje) {
-        // Puedes implementar toast notifications aquí o usar alertas simples
-        alert(`[${tipo.toUpperCase()}] ${mensaje}`);
+        // Unificar con showFlashMessage
+        showFlashMessage(mensaje, tipo === 'success' ? 'success' : 'error');
     }
 });

@@ -169,10 +169,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Registrar venta
     registrarVentaBtn.addEventListener('click', async () => {
+        if (registrarVentaBtn.disabled) return; // Evita doble click rápido
         if (seleccionados.length === 0) {
-            alert('No puedes realizar una venta sin productos seleccionados.');
+            showFlashMessage('No puedes realizar una venta sin productos seleccionados.', 'error');
             return; // Detiene la ejecución si no hay productos seleccionados
         }
+
+        registrarVentaBtn.disabled = true;
+        registrarVentaBtn.classList.add('opacity-60', 'cursor-not-allowed');
 
         const metodoPago = metodoPagoSelect.value;
 
@@ -182,24 +186,26 @@ document.addEventListener('DOMContentLoaded', () => {
             metodo_pago: parseInt(metodoPago)
         };
 
-        console.log({
-            productos: seleccionados,
-            total: parseFloat(totalVenta.textContent),
-            metodo_pago: parseInt(metodoPago)
-        });
+        try {
+            const response = await fetch('/api/registrar_venta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(venta)
+            });
 
-        const response = await fetch('/api/registrar_venta', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(venta)
-        });
-
-        if (response.ok) {
-            alert('Venta registrada con éxito');
-            location.reload(); // Recarga la página después de registrar la venta
-        } else {
-            const error = await response.json();
-            alert(`Error al registrar la venta: ${error.message}`);
+            if (response.ok) {
+                showFlashMessage('Venta registrada con éxito', 'success');
+                setTimeout(() => location.reload(), 1200); // Recarga la página tras mostrar mensaje
+            } else {
+                const error = await response.json();
+                showFlashMessage(`Error al registrar la venta: ${error.message}`, 'error');
+                registrarVentaBtn.disabled = false;
+                registrarVentaBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+        } catch (e) {
+            showFlashMessage('Error de red al registrar la venta.', 'error');
+            registrarVentaBtn.disabled = false;
+            registrarVentaBtn.classList.remove('opacity-60', 'cursor-not-allowed');
         }
     });
 

@@ -12,7 +12,7 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 # Clave secreta para Flask
-SECRET_KEY = os.getenv('SECRET_KEY', 'clave-por-defecto') #esto sirve para que no se vea la clave en el código de la aplicación y se mantenga segura osea en palabras mas sencillas es para que no se vea la clave en el código de la aplicación y se mantenga segura
+SECRET_KEY = os.getenv('SECRET_KEY') #esto sirve para que no se vea la clave en el código de la aplicación y se mantenga segura osea en palabras mas sencillas es para que no se vea la clave en el código de la aplicación y se mantenga segura
 #con codigo de la aplicación me refiero a que es el código que se ejecuta en el servidor
 
 # Función para obtener una conexión a la base de datos

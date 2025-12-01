@@ -189,10 +189,14 @@ document.addEventListener('DOMContentLoaded', function () {
   if (addProductForm) {
     addProductForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      const submitBtn = addProductForm.querySelector('button[type="submit"]');
+      if (submitBtn && submitBtn.disabled) return;
       console.log('=== ENVIANDO FORMULARIO AÑADIR PRODUCTO ===');
-      
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+      }
       const formData = new FormData(this);
-      
       fetch('/agregar_producto', { 
         method: 'POST', 
         body: formData 
@@ -201,20 +205,28 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         console.log('Respuesta del servidor:', data);
         if (data.success) {
-          alert('Producto guardado correctamente');
+          showFlashMessage('Producto guardado correctamente', 'success');
           const modal = document.getElementById('addProductModal');
           if (modal) {
             modal.classList.add('hidden');
             modal.style.display = 'none';
           }
-          location.reload();
+          setTimeout(() => location.reload(), 1200);
         } else {
-          alert('Error: ' + data.message);
+          showFlashMessage('Error: ' + data.message, 'error');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+          }
         }
       })
       .catch(err => {
         console.error('Error:', err);
-        alert('Ocurrió un error al guardar el producto');
+        showFlashMessage('Ocurrió un error al guardar el producto', 'error');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
       });
     });
   }
@@ -224,10 +236,14 @@ document.addEventListener('DOMContentLoaded', function () {
   if (addCategoryForm) {
     addCategoryForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      const submitBtn = addCategoryForm.querySelector('button[type="submit"]');
+      if (submitBtn && submitBtn.disabled) return;
       console.log('=== ENVIANDO FORMULARIO AÑADIR CATEGORÍA ===');
-      
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+      }
       const categoryName = document.getElementById('categoryName').value;
-      
       if (categoryName.trim() !== '') {
         fetch('/add_category', {
           method: 'POST',
@@ -238,16 +254,29 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
           console.log('Respuesta del servidor:', data);
           if (data.success) {
-            alert('Categoría añadida con éxito!');
-            location.reload();
+            showFlashMessage('Categoría añadida con éxito!', 'success');
+            setTimeout(() => location.reload(), 1200);
           } else {
-            alert('Error: ' + data.message);
+            showFlashMessage('Error: ' + data.message, 'error');
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Error en la comunicación con el servidor');
+          showFlashMessage('Error en la comunicación con el servidor', 'error');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+          }
         });
+      } else {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
       }
     });
   }
@@ -271,15 +300,15 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
           console.log('Respuesta del servidor:', data);
           if (data.success) {
-            alert('Categoría eliminada con éxito!');
-            location.reload();
+            showFlashMessage('Categoría eliminada con éxito!', 'success');
+            setTimeout(() => location.reload(), 1200);
           } else {
-            alert('Error: ' + data.message);
+            showFlashMessage('Error: ' + data.message, 'error');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Error en la comunicación con el servidor');
+          showFlashMessage('Error en la comunicación con el servidor', 'error');
         });
       }
     }
@@ -308,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         console.log('Respuesta del servidor:', data);
         if (data.success) {
-          alert('Cantidad añadida correctamente');
+          showFlashMessage('Cantidad añadida correctamente', 'success');
           const modal = document.getElementById('addQuantityModal');
           if (modal) {
             modal.classList.add('hidden');
@@ -316,14 +345,14 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.style.alignItems = '';
             modal.style.justifyContent = '';
           }
-          location.reload();
+          setTimeout(() => location.reload(), 1200);
         } else {
-          alert('Error: ' + data.message);
+          showFlashMessage('Error: ' + data.message, 'error');
         }
       })
       .catch(err => {
         console.error('Error:', err);
-        alert('Ocurrió un error al añadir la cantidad');
+        showFlashMessage('Ocurrió un error al añadir la cantidad', 'error');
       });
     });
   }
@@ -359,20 +388,20 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         console.log('Respuesta del servidor:', data);
         if (data.success) {
-          alert('Producto actualizado correctamente');
+          showFlashMessage('Producto actualizado correctamente', 'success');
           const modal = document.getElementById('editProductModal');
           if (modal) {
             modal.classList.add('hidden');
             modal.style.display = 'none';
           }
-          location.reload();
+          setTimeout(() => location.reload(), 1200);
         } else {
-          alert('Error: ' + data.message);
+          showFlashMessage('Error: ' + data.message, 'error');
         }
       })
       .catch(err => {
         console.error('Error:', err);
-        alert('Ocurrió un error al actualizar el producto');
+        showFlashMessage('Ocurrió un error al actualizar el producto', 'error');
       });
     });
   }
@@ -476,12 +505,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const quantityToDelete = parseInt(document.getElementById('quantityToDelete').value);
     
     if (!quantityToDelete || quantityToDelete <= 0) {
-      alert('Por favor, ingresa una cantidad válida.');
+      showFlashMessage('Por favor, ingresa una cantidad válida.', 'error');
       return;
     }
 
     if (quantityToDelete > window.currentProductStock) {
-      alert('No puedes eliminar más cantidad de la que tienes en stock.');
+      showFlashMessage('No puedes eliminar más cantidad de la que tienes en stock.', 'error');
       return;
     }
 
@@ -499,16 +528,16 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.ok ? res.json() : Promise.reject('Error del servidor'))
         .then(data => {
           if (data.success) {
-            alert('Producto eliminado completamente');
+            showFlashMessage('Producto eliminado completamente', 'success');
             hideModal('deleteQuantityModal');
-            location.reload();
+            setTimeout(() => location.reload(), 1200);
           } else {
-            alert('Error: ' + data.message);
+            showFlashMessage('Error: ' + data.message, 'error');
           }
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('Ocurrió un error al eliminar el producto');
+          showFlashMessage('Ocurrió un error al eliminar el producto', 'error');
         });
       } else {
         // Reducir cantidad usando la ruta de reducir stock
@@ -520,16 +549,16 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.ok ? res.json() : Promise.reject('Error del servidor'))
         .then(data => {
           if (data.success) {
-            alert(`Se eliminaron ${quantityToDelete} unidades del inventario`);
+            showFlashMessage(`Se eliminaron ${quantityToDelete} unidades del inventario`, 'success');
             hideModal('deleteQuantityModal');
-            location.reload();
+            setTimeout(() => location.reload(), 1200);
           } else {
-            alert('Error: ' + data.message);
+            showFlashMessage('Error: ' + data.message, 'error');
           }
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('Ocurrió un error al reducir el stock');
+          showFlashMessage('Ocurrió un error al reducir el stock', 'error');
         });
       }
     }

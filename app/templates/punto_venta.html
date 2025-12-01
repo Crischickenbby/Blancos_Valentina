@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="{{ url_for('static', filename='js/punto_venta.js') }}" defer></script>
+    <!-- FontAwesome para íconos flash -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,15 +42,52 @@
 </head>
 
 <body class="bg-gray-100 font-sans">
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div id="flash-message" class="fixed top-4 right-4 z-50 space-y-3">
+        {% for category, message in messages %}
+        <div class="
+                            {% if category == 'error' %}
+                                bg-gradient-to-r from-pink-400 to-pink-600 border-pink-500
+                            {% elif category == 'success' %}
+                                bg-gradient-to-r from-green-400 to-green-600 border-green-500
+                            {% else %}
+                                bg-gradient-to-r from-gray-200 to-gray-300 border-gray-400
+                            {% endif %}
+                            text-white px-6 py-4 rounded-xl shadow-2xl border min-w-[300px] max-w-md backdrop-blur-sm">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">
+                    {% if category == 'error' %}{% elif category == 'success' %}{% else %}ℹ{% endif %}
+                </span>
+                <p class="font-semibold">{{ message }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <script>
+        setTimeout(function () {
+            const flash = document.getElementById('flash-message');
+            if (flash) {
+                flash.style.transition = "opacity 0.5s";
+                flash.style.opacity = 0;
+                setTimeout(() => flash.remove(), 500);
+            }
+        }, 3000);
+    </script>
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <div class="sidebar fixed left-0 top-0 w-20 lg:w-64 h-screen bg-gradient-to-b from-purple-600 to-pink-600 text-white transition-all duration-300 ease-in-out flex flex-col z-40" id="sidebar">
+        <div class="sidebar fixed left-0 top-0 w-20 lg:w-64 h-screen bg-gradient-to-b from-purple-600 to-pink-600 text-white transition-all duration-300 ease-in-out flex flex-col z-40"
+            id="sidebar">
             <!-- Logo -->
             <div class="p-4 border-b border-purple-500 flex flex-col items-center">
                 <div class="centrar_logo w-full flex flex-row items-center justify-between">
                     <div class="flex flex-col">
                         <!-- Logo grande (solo expandido) -->
-                        <div class="logo_name lg:block text-2xl font-bold flex justify-center items-center h-full" id="sidebarLogo">
+                        <div class="logo_name lg:block text-2xl font-bold flex justify-center items-center h-full"
+                            id="sidebarLogo">
                             <i class='bx bx-heart text-pink-200 mr-2'></i>
                             Valentina
                         </div>
@@ -56,7 +95,8 @@
                         <div class="logo_icon h-12 lg:hidden" id="sidebarLogoSmall">
                             <i class='bx bx-heart text-pink-200 text-3xl'></i>
                         </div>
-                        <span class="hidden lg:block text-xs text-purple-100 font-medium" id="sidebarSubtitle">BLANCOS Y TEXTILES</span>
+                        <span class="hidden lg:block text-xs text-purple-100 font-medium" id="sidebarSubtitle">BLANCOS Y
+                            TEXTILES</span>
                     </div>
                     <!--
                         Icono de menú lateral: Este elemento representa el botón para abrir o cerrar el menú lateral en la interfaz de punto de venta.
@@ -71,65 +111,73 @@
             <nav class="flex-1 py-4">
                 <ul class="nav-list space-y-2 px-2">
                     <li>
-                        <a href="{{ url_for('venta') }}" 
-                        class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
-                        <i class='bx bx-cart-alt text-xl min-w-[24px]'></i>
-                        <span class="links_name ml-3 hidden lg:inline">Ventas</span>
-                    </a>
-                </li>
-                <!--
-                                <li>
-                                    <a href="{{ url_for('ropa') }}" 
-                                       class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
-                                        <i class='bx bx-closet text-xl min-w-[24px]'></i>
-                                        <span class="links_name ml-3 hidden lg:inline">Venta de ropa</span>
-                                    </a>
-                                </li>
-                -->
+                        <a href="{{ url_for('venta') }}"
+                            class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                            <i class='bx bx-cart-alt text-xl min-w-[24px]'></i>
+                            <span class="links_name ml-3 hidden lg:inline">Ventas</span>
+                        </a>
+                    </li>
+
                     <li>
-                        <a href="{{ url_for('almacen') }}" 
-                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                        <a href="{{ url_for('ropa') }}"
+                            class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                            <i class='bx bx-closet text-xl min-w-[24px]'></i>
+                            <span class="links_name ml-3 hidden lg:inline">Venta de ropa</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('almacen') }}"
+                            class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
                             <i class='bx bx-package text-xl min-w-[24px]'></i>
-                            <span class="links_name ml-3 hidden lg:inline">Productos</span>
+                            <span class="links_name ml-3 hidden lg:inline">Almacén</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('apartado') }}" 
-                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                        <a href="{{ url_for('apartado') }}"
+                            class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
                             <i class='bx bx-bookmark text-xl min-w-[24px]'></i>
-                            <span class="links_name ml-3 hidden lg:inline">Apartado</span>
+                            <span class="links_name ml-3 hidden lg:inline">Apartados</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('empleado') }}" 
-                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                        <a href="{{ url_for('empleado') }}"
+                            class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
                             <i class='bx bx-user-plus text-xl min-w-[24px]'></i>
                             <span class="links_name ml-3 hidden lg:inline">Empleados</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('devolucion') }}" 
-                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                        <a href="{{ url_for('devolucion') }}"
+                            class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
                             <i class='bx bx-undo text-xl min-w-[24px]'></i>
                             <span class="links_name ml-3 hidden lg:inline">Devoluciones</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ url_for('corte') }}" 
-                           class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
+                        <a href="{{ url_for('corte') }}"
+                            class="flex items-center p-2 lg:p-3 justify-center lg:justify-start rounded-lg hover:bg-purple-700 hover:bg-opacity-50 transition-colors group">
                             <i class='bx bx-money-withdraw text-xl min-w-[24px]'></i>
-                            <span class="links_name ml-3 hidden lg:inline">Corte de Caja</span>
+                            <span class="links_name ml-3 hidden lg:inline">Caja</span>
                         </a>
                     </li>
-                   
+
                 </ul>
             </nav>
+            <!-- Botón de cerrar sesión -->
+            <div class="px-2 mt-8">
+                <button onclick="confirmarLogout()"
+                    class="w-full flex items-center justify-center lg:justify-start p-2 lg:p-3 rounded-lg ">
+                    <i class='bx bx-log-out text-xl min-w-[24px]'></i>
+                    <span class="ml-3 hidden lg:inline">Cerrar sesión</span>
+                </button>
+            </div>
         </div>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col ml-20 lg:ml-64 transition-all duration-300">
             <!-- Header -->
-            
+
 
             <!-- Content Area -->
             <div class="flex-1 flex">
@@ -143,48 +191,61 @@
                         <p class="text-gray-600 text-lg mb-10 text-center">Selecciona una sección para comenzar</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             <!-- Card Ventas -->
-                            <a href="{{ url_for('venta') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
-                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                            <a href="{{ url_for('venta') }}"
+                                class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div
+                                    class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
                                     <i class="bx bx-cart-alt text-white text-4xl"></i>
                                 </div>
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">Ventas</h2>
                                 <p class="text-gray-500 text-center">Gestiona las ventas y el carrito de compras.</p>
                             </a>
                             <!-- Card Productos -->
-                            <a href="{{ url_for('almacen') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
-                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                            <a href="{{ url_for('almacen') }}"
+                                class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div
+                                    class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
                                     <i class="bx bx-package text-white text-4xl"></i>
                                 </div>
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">Productos</h2>
-                                <p class="text-gray-500 text-center">Administra el inventario y los productos disponibles.</p>
+                                <p class="text-gray-500 text-center">Administra el inventario y los productos
+                                    disponibles.</p>
                             </a>
                             <!-- Card Apartado -->
-                            <a href="{{ url_for('apartado') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
-                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                            <a href="{{ url_for('apartado') }}"
+                                class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div
+                                    class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
                                     <i class="bx bx-bookmark text-white text-4xl"></i>
                                 </div>
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">Apartado</h2>
                                 <p class="text-gray-500 text-center">Gestiona los apartados y pagos pendientes.</p>
                             </a>
                             <!-- Card Empleados -->
-                            <a href="{{ url_for('empleado') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
-                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                            <a href="{{ url_for('empleado') }}"
+                                class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div
+                                    class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
                                     <i class="bx bx-user-plus text-white text-4xl"></i>
                                 </div>
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">Empleados</h2>
                                 <p class="text-gray-500 text-center">Administra el personal y sus privilegios.</p>
                             </a>
                             <!-- Card Devoluciones -->
-                            <a href="{{ url_for('devolucion') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
-                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                            <a href="{{ url_for('devolucion') }}"
+                                class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div
+                                    class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
                                     <i class="bx bx-undo text-white text-4xl"></i>
                                 </div>
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">Devoluciones</h2>
                                 <p class="text-gray-500 text-center">Gestiona las devoluciones y reembolsos.</p>
                             </a>
                             <!-- Card Corte de Caja -->
-                            <a href="{{ url_for('corte') }}" class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
-                                <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
+                            <a href="{{ url_for('corte') }}"
+                                class="group bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:shadow-2xl transition-all duration-300 border-2 border-purple-100 hover:scale-105 cursor-pointer">
+                                <div
+                                    class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-5 mb-4 shadow-md">
                                     <i class="bx bx-money-withdraw text-white text-4xl"></i>
                                 </div>
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">Corte de Caja</h2>
@@ -199,6 +260,53 @@
     </div>
 
     {% block scripts %}{% endblock %}
+    <script>
+        function confirmarLogout() {
+            if (confirm('¿Seguro que deseas cerrar sesión?')) {
+                window.location.href = "{{ url_for('logout') }}";
+            }
+        }
+        // Función global para mostrar mensajes flash desde JS
+        function showFlashMessage(message, category = 'info') {
+            // Remover mensaje anterior si existe
+            const oldFlash = document.getElementById('js-flash-message');
+            if (oldFlash) oldFlash.remove();
+
+            // Colores e iconos por categoría
+            let bg = '', icon = '';
+            if (category === 'error') {
+                bg = 'bg-gradient-to-r from-pink-400 to-pink-600 border-pink-500';
+                icon = '<i class="fas fa-times-circle text-2xl"></i>';
+            } else if (category === 'success') {
+                bg = 'bg-gradient-to-r from-green-400 to-green-600 border-green-500';
+                icon = '<i class="fas fa-check-circle text-2xl"></i>';
+            } else {
+                bg = 'bg-gradient-to-r from-gray-200 to-gray-300 border-gray-400';
+                icon = '<i class="fas fa-info-circle text-2xl"></i>';
+            }
+
+            // Crear contenedor
+            const flashDiv = document.createElement('div');
+            flashDiv.id = 'js-flash-message';
+            flashDiv.className = 'fixed top-4 right-4 z-50 min-w-[300px] max-w-md space-y-3';
+            flashDiv.innerHTML = `
+                <div class="${bg} text-white px-6 py-4 rounded-xl shadow-2xl border flex items-center space-x-3 animate-fade-in">
+                    <span>${icon}</span>
+                    <p class="font-semibold flex-1">${message}</p>
+                    <button onclick="this.closest('#js-flash-message').remove()" class="ml-4 text-white hover:text-gray-200 text-xl font-bold focus:outline-none">&times;</button>
+                </div>
+            `;
+            document.body.appendChild(flashDiv);
+            // Auto-ocultar después de 3s
+            setTimeout(() => {
+                if (flashDiv) {
+                    flashDiv.style.transition = 'opacity 0.5s';
+                    flashDiv.style.opacity = 0;
+                    setTimeout(() => flashDiv.remove(), 500);
+                }
+            }, 3000);
+        }
+    </script>
 </body>
 
 </html>
