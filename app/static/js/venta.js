@@ -1,4 +1,46 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- BLOQUEO SI NO HAY CAJA ABIERTA ---
+    const overlay = document.createElement('div');
+    overlay.id = 'overlay-caja-cerrada';
+    overlay.style.position = 'fixed';
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(255,255,255,0.92)';
+    overlay.style.zIndex = 9999;
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.innerHTML = `
+        <div style="background: white; border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.18); padding: 2.5rem 2rem; border: 2px solid #e11d48; max-width: 95vw;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
+                <i class="fas fa-lock text-4xl" style="color: #e11d48;"></i>
+                <span style="font-size: 2rem; font-weight: bold; color: #e11d48;">Caja cerrada</span>
+            </div>
+            <p style="font-size: 1.2rem; color: #444; margin-bottom: 0.5rem;">No puedes realizar ventas porque la caja está cerrada.</p>
+            <button style="background: #e11d48; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.75rem; font-size: 1rem; cursor: pointer;" onclick="location.href='/corte'">
+                Abrir Caja
+            </button>
+        </div>
+    `;
+    fetch('/api/caja/estado')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.abierta) {
+                document.body.appendChild(overlay);
+                document.body.style.overflow = 'hidden';
+            } else {
+                const old = document.getElementById('overlay-caja-cerrada');
+                if (old) old.remove();
+                document.body.style.overflow = '';
+            }
+        })
+        .catch(() => {
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+        });
     const buscador = document.getElementById('buscador');
     const tablaProductos = document.getElementById('tabla-productos');
     const productosSeleccionados = document.getElementById('productos-seleccionados');
