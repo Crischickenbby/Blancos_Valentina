@@ -249,7 +249,22 @@ def punto_venta():
 @app.route('/venta')#Esta ruta es para el apartado de venta, donde solo pueden entrar los usuarios que tengan el rol 1 o 2(Jefe o empleado)
 @login_required(roles=[1, 2])
 def venta():
+
     return render_template('venta.html')   #prueba mientras se verifica la parte del dashboard  
+
+# ================= API: Categorías para venta =================
+@app.route('/api/categorias', methods=['GET'])
+@login_required(roles=[1, 2])
+def api_categorias():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT "ID_Category", "Category" FROM "Category" ORDER BY "Category" ASC;')
+    categorias = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify([
+        {"id": c[0], "nombre": c[1]} for c in categorias
+    ])
 
 
 @app.route('/api/registrar_venta', methods=['POST'])
@@ -347,7 +362,7 @@ def api_productos():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('SELECT "ID_Product", "Name", "Description", "Price", "Quanty" FROM "Product" WHERE "ID_Product_Status" = 1 AND "Quanty" > 0;')
+        cur.execute('SELECT "ID_Product", "Name", "Description", "Price", "Quanty", "ID_Category" FROM "Product" WHERE "ID_Product_Status" = 1 AND "Quanty" > 0;')
         productos = cur.fetchall()
         
         # ⏱️ MEDICIÓN DE RENDIMIENTO: Calcular tiempo de consulta API productos
@@ -360,7 +375,8 @@ def api_productos():
             "nombre": p[1],
             "descripcion": p[2],
             "precio": float(p[3]),
-            "stock": p[4]
+            "stock": p[4],
+            "id_categoria": p[5]
         } for p in productos])
     finally:
         cur.close()
