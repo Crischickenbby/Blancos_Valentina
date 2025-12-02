@@ -142,13 +142,110 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     filtrados.forEach(prod => {
                         const card = document.createElement('div');
-                        card.className = 'p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 shadow flex flex-col gap-2';
+                        card.className = 'p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 shadow flex flex-col gap-2 cursor-pointer hover:shadow-xl hover:border-pink-400 transition-all';
                         card.innerHTML = `
                             <div class="font-bold text-lg text-purple-700">${prod.nombre || prod.name}</div>
                             <div class="text-gray-600 text-sm mb-1">${prod.descripcion || ''}</div>
                             <div class="text-pink-700 font-semibold">$${prod.precio ? prod.precio.toFixed(2) : (prod.price ? prod.price.toFixed(2) : '')}</div>
                             <div class="text-xs text-gray-400">Stock: ${prod.stock ?? ''}</div>
                         `;
+                        card.addEventListener('click', function() {
+                            let maxStock = prod.stock ?? 0;
+                            if (maxStock <= 0) {
+                                mostrarFlash('No hay stock disponible de este producto.', 'error');
+                                return;
+                            }
+                            mostrarModalCantidad(prod, maxStock);
+                        });
+                        // MODAL BONITO PARA INGRESAR CANTIDAD
+                        function mostrarModalCantidad(prod, maxStock) {
+                            // Si ya existe, elimínalo
+                            let modal = document.getElementById('modal-cantidad-producto');
+                            if (modal) modal.remove();
+                            modal = document.createElement('div');
+                            modal.id = 'modal-cantidad-producto';
+                            modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-40';
+                            modal.innerHTML = `
+                                <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full border-4 border-pink-200 flex flex-col items-center animate-fade-in">
+                                    <h3 class="text-xl font-bold text-purple-700 mb-2 text-center">¿Cuántas unidades deseas agregar?</h3>
+                                    <div class="text-gray-500 text-sm mb-4">Stock disponible: <span class="font-semibold text-pink-600">${maxStock}</span></div>
+                                    <input id="input-cantidad-modal" type="number" min="1" max="${maxStock}" value="1" class="w-24 text-center border-2 border-purple-200 rounded-lg py-2 px-3 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-pink-400 mb-4" />
+                                    <div class="flex gap-4 w-full">
+                                        <button id="btn-cantidad-aceptar" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold py-2 rounded-lg transition-all">Agregar</button>
+                                        <button id="btn-cantidad-cancelar" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-lg transition-all">Cancelar</button>
+                                    </div>
+                                </div>
+                            `;
+                            document.body.appendChild(modal);
+                            document.body.style.overflow = 'hidden';
+
+                            const input = document.getElementById('input-cantidad-modal');
+                            input.focus();
+                            input.select();
+
+                            // Cerrar modal
+                            function cerrar() {
+                                modal.remove();
+                                document.body.style.overflow = '';
+                            }
+                            document.getElementById('btn-cantidad-cancelar').onclick = cerrar;
+                            modal.onclick = function(e) { if (e.target === modal) cerrar(); };
+
+
+                            // Validar y corregir input en tiempo real
+                            input.addEventListener('input', function() {
+                                // Permitir vacío temporalmente para que el usuario pueda borrar
+                                if (input.value === '') return;
+                                let val = parseInt(input.value);
+                                if (isNaN(val) || val < 1) {
+                                    input.value = 1;
+                                } else if (val > maxStock) {
+                                    input.value = maxStock;
+                                }
+                            });
+
+                            // Agregar producto al carrito global
+                            document.getElementById('btn-cantidad-aceptar').onclick = function() {
+                                let cantidad = parseInt(input.value);
+                                if (isNaN(cantidad) || cantidad <= 0) {
+                                    mostrarFlash('Cantidad inválida.', 'error');
+                                    return;
+                                }
+                                if (cantidad > maxStock) {
+                                    input.value = maxStock;
+                                    cantidad = maxStock;
+                                }
+                                // Buscar producto en array global productos (asegura referencia global)
+                                const productoGlobal = window.productos ? window.productos.find(p => p.id === prod.id) : productos.find(p => p.id === prod.id);
+                                if (!productoGlobal || productoGlobal.stock < cantidad) {
+                                    mostrarFlash('Stock insuficiente.', 'error');
+                                    return;
+                                }
+                                // Buscar si ya está en seleccionados (carrito global)
+                                let existente = window.seleccionados ? window.seleccionados.find(p => p.id === prod.id) : seleccionados.find(p => p.id === prod.id);
+                                if (existente) {
+                                    if (existente.cantidad + cantidad > (productoGlobal.stock)) {
+                                        mostrarFlash('No puedes agregar más de las que hay en stock.', 'error');
+                                        return;
+                                    }
+                                    existente.cantidad += cantidad;
+                                } else {
+                                    (window.seleccionados || seleccionados).push({ ...productoGlobal, cantidad });
+                                }
+                                productoGlobal.stock -= cantidad;
+                                (window.actualizarSeleccionados || actualizarSeleccionados)();
+                                (window.renderProductos || renderProductos)(window.productos || productos);
+                                mostrarFlash('Producto agregado al carrito.', 'success');
+                                cerrar();
+                            };
+
+                            // Permitir Enter para aceptar
+                            input.addEventListener('keydown', function(e) {
+                                if (e.key === 'Enter') {
+                                    document.getElementById('btn-cantidad-aceptar').click();
+                                }
+                            });
+                        }
                         listaProductosModal.appendChild(card);
                     });
                 }
