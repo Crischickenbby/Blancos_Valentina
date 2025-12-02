@@ -18,90 +18,110 @@
         <p class="text-gray-600 text-lg">Realiza ventas de tu tienda</p>
     </div>
 
-        <!-- Carrito de Compras -->
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex-1">
-            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-8">
-                <h2 class="text-3xl font-bold mb-2">
-                    <i class="fas fa-shopping-cart mr-3"></i>
-                    Carrito de Compras
-                </h2>
-                <p class="text-purple-100 text-base">Productos seleccionados para la venta</p>
+    <!-- Carrito de Compras -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex-1">
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-8">
+            <h2 class="text-3xl font-bold mb-2">
+                <i class="fas fa-shopping-cart mr-3"></i>
+                Carrito de Compras
+            </h2>
+            <p class="text-purple-100 text-base">Productos seleccionados para la venta</p>
+        </div>
+        <div class="p-6">
+            <div class="mb-6 overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gradient-to-r from-gray-50 to-slate-50">
+                        <tr>
+                            <th
+                                class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                Producto</th>
+                            <th
+                                class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                Descripción</th>
+                            <th
+                                class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                Cantidad</th>
+                            <th
+                                class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                Precio Unit.</th>
+                            <th
+                                class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                Subtotal</th>
+                            <th
+                                class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productos-seleccionados" class="bg-white divide-y divide-gray-200">
+                        <!-- Los productos seleccionados se llenarán dinámicamente -->
+                    </tbody>
+                </table>
             </div>
-            <div class="p-6">
-                <div class="mb-6 overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gradient-to-r from-gray-50 to-slate-50">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">Producto</th>
-                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">Descripción</th>
-                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">Cantidad</th>
-                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">Precio Unit.</th>
-                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">Subtotal</th>
-                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productos-seleccionados" class="bg-white divide-y divide-gray-200">
-                            <!-- Los productos seleccionados se llenarán dinámicamente -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="grid grid-cols-1 gap-6">
-                    <div class="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
-                        <div class="text-center">
-                            <p class="text-base font-medium text-gray-600 mb-2">Total de la Venta</p>
-                            <p class="text-4xl font-bold text-purple-600">
-                                $<span id="total-venta">0.00</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="metodo-pago" class="block text-base font-semibold text-gray-700 mb-3">
-                                <i class="fas fa-credit-card mr-2"></i>Método de Pago:
-                            </label>
-                            <select id="metodo-pago" 
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-base">
-                                <option value="1">💵 Efectivo</option>
-                                <option value="2">🏦 Transferencia</option>
-                                <option value="3">💳 Tarjeta</option>
-                            </select>
-                        </div>
-                        <button id="registrar-venta"
-                            class="btn-venta w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center gap-3">
-                            <i class="fas fa-cash-register text-lg"></i>
-                            Registrar Venta
-                        </button>
+            <div class="grid grid-cols-1 gap-6">
+                <div class="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
+                    <div class="text-center">
+                        <p class="text-base font-medium text-gray-600 mb-2">Total de la Venta</p>
+                        <p class="text-4xl font-bold text-purple-600">
+                            $<span id="total-venta">0.00</span>
+                        </p>
                     </div>
                 </div>
-            </div>
-
-        </div>
-
-
-
-        <!-- Categorías como cards con buscador -->
-        <div id="categorias-lista" class="mt-10 p-6 bg-white rounded-2xl shadow-lg border border-purple-100">
-            <h3 class="text-2xl font-bold text-purple-700 mb-4 flex items-center gap-2">
-                <i class="fas fa-tags"></i> Categorías disponibles
-            </h3>
-            <div class="mb-6 flex items-center gap-3">
-                <input id="buscador-categorias" type="text" placeholder="Buscar categoría..." class="w-full md:w-1/3 px-4 py-2 border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400" />
-            </div>
-            <div id="categorias-contenido" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Aquí se insertarán las categorías dinámicamente -->
-            </div>
-        </div>
-
-        <!-- Modal de productos por categoría -->
-        <div id="modal-productos-categoria" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full border-2 border-pink-400 animate-fade-in relative">
-                <button id="cerrar-modal-categoria" class="absolute top-3 right-3 text-gray-400 hover:text-pink-600 text-2xl font-bold">&times;</button>
-                <h4 class="text-2xl font-bold text-pink-700 mb-4 flex items-center gap-2">
-                    <i class="fas fa-box"></i> Productos de la categoría: <span id="nombre-categoria-modal" class="ml-2"></span>
-                </h4>
-                <div id="lista-productos-modal" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="metodo-pago" class="block text-base font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-credit-card mr-2"></i>Método de Pago:
+                        </label>
+                        <select id="metodo-pago"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-base">
+                            <option value="1">💵 Efectivo</option>
+                            <option value="2">🏦 Transferencia</option>
+                            <option value="3">💳 Tarjeta</option>
+                        </select>
+                    </div>
+                    <button id="registrar-venta"
+                        class="btn-venta w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center gap-3">
+                        <i class="fas fa-cash-register text-lg"></i>
+                        Registrar Venta
+                    </button>
+                </div>
             </div>
         </div>
+
+    </div>
+
+
+
+    <!-- Categorías como cards con buscador -->
+    <div id="categorias-lista"
+        class="mt-10 p-7 bg-white rounded-2xl shadow-lg border border-gray-200">
+        <h3 class="text-2xl font-bold text-purple-700 mb-6 flex items-center gap-3">
+            <i class="fas fa-tags text-purple-600 text-2xl"></i> Categorías disponibles
+        </h3>
+        <div class="mb-6 flex items-center gap-3">
+            <input id="buscador-categorias" type="text" placeholder="Buscar categoría..."
+                class="w-full md:w-1/3 px-5 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white shadow text-base transition-all duration-200" />
+        </div>
+        <div id="categorias-contenido" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <!-- Aquí se insertarán las categorías dinámicamente como tarjetas -->
+        </div>
+    </div>
+
+    <!-- Modal de productos por categoría -->
+    <div id="modal-productos-categoria"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-40">
+        <div
+            class="bg-gradient-to-br from-white via-pink-100 to-purple-100 rounded-3xl shadow-2xl p-10 max-w-3xl w-full border-4 border-purple-300 animate-fade-in relative flex flex-col">
+            <button id="cerrar-modal-categoria"
+                class="absolute top-4 right-6 text-gray-400 hover:text-pink-600 text-3xl font-extrabold transition-transform duration-200 hover:scale-125">&times;</button>
+            <h4 class="text-3xl font-extrabold text-purple-700 mb-7 flex items-center gap-4">
+                <i class="fas fa-box-open text-3xl bg-gradient-to-r from-pink-200 to-purple-200 rounded-full p-2 shadow"></i> Productos de la categoría: <span id="nombre-categoria-modal"
+                    class="ml-2"></span>
+            </h4>
+            <div id="lista-productos-modal" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                <!-- Aquí se insertarán los productos dinámicamente como tarjetas -->
+            </div>
+        </div>
+    </div>
 
 </div>
 {% endblock %}

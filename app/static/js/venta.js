@@ -105,18 +105,20 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         cont.innerHTML = '';
-        categorias.forEach(cat => {
-            const card = document.createElement('div');
-            card.className = 'categoria-card cursor-pointer bg-gradient-to-br from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 border-2 border-purple-200 hover:border-pink-400 rounded-xl shadow-md p-6 flex flex-col items-center gap-2 transition-all duration-200';
-            card.innerHTML = `
-                <i class="fas fa-tag text-3xl text-pink-500 mb-2"></i>
-                <span class="font-bold text-lg text-purple-800">${cat.nombre}</span>
-            `;
-            card.onclick = function() {
-                abrirModalCategoria(cat.id, cat.nombre);
-            };
-            cont.appendChild(card);
-        });
+            categorias.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = `categoria-card cursor-pointer bg-white border-2 border-pink-400 rounded-3xl shadow-xl p-8 flex flex-col items-center gap-4 transition-all duration-200 hover:shadow-2xl hover:scale-105 hover:border-purple-400`;
+                card.innerHTML = `
+                    <div class="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 via-purple-400 to-purple-600 shadow-lg mb-4 border-4 border-white">
+                        <i class="fas fa-tag text-4xl text-white drop-shadow"></i>
+                    </div>
+                    <span class="font-black text-xs tracking-widest text-gray-700 text-center uppercase">${cat.nombre}</span>
+                `;
+                card.onclick = function() {
+                    abrirModalCategoria(cat.id, cat.nombre);
+                };
+                cont.appendChild(card);
+            });
     }
 
     buscador.addEventListener('input', function() {
